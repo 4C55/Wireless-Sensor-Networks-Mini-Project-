@@ -1,0 +1,23 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/../os/",
+                "${workspaceFolder}/../os/sys/",
+                "${workspaceFolder}/../os/net/app-layer/coap/tinydtls-support/",
+                "${workspaceFolder}/../arch/cpu/msp430/",
+                "${workspaceFolder}/../arch/platform/sky/",
+                "${workspaceFolder}/../arch/dev/sht11/",
+                "/usr/include/x86_64-linux-gnu/sys"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 4
+}

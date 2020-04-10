@@ -1,0 +1,28 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "make TARGET=sky PORT=/dev/ttyUSB0 main.upload",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "options": {
+                "cwd": "${workspaceRoot}/server/"
+            }
+        },
+        {
+            "label": "connect",
+            "type": "shell",
+            "command": "make TARGET=sky PORT=/dev/ttyUSB0 login",
+            "group": "test",
+            "options": {
+                "cwd": "${workspaceRoot}/server/"
+        }
+        }
+    ]
+}

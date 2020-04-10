@@ -1,0 +1,29 @@
+{
+    "files.associations": {
+        "contiki.h": "c",
+        "stdio.h": "c",
+        "rtimer.h": "c",
+        "rtimer-arch.h": "c",
+        "stdbool.h": "c",
+        "watchdog.h": "c",
+        "clock.h": "c",
+        "contiki-default-conf.h": "c",
+        "process.h": "c",
+        "autostart.h": "c",
+        "timer.h": "c",
+        "ctimer.h": "c",
+        "etimer.h": "c",
+        "contiki-conf.h": "c",
+        "msp430-def.h": "c",
+        "humidity_driver.h": "c",
+        "system_error": "c",
+        "sky-def.h": "c",
+        "button-sensor.h": "c",
+        "array": "c",
+        "string": "c",
+        "leds.h": "c",
+        "log.h": "c",
+        "uip-debug.h": "c",
+        "tcp-socket.h": "c"
+    }
+}
