@@ -24,6 +24,14 @@ extern "C"
 /* PUBLIC ENUMERATIONS                                                       */
 /*****************************************************************************/
 
+enum connection_state
+{
+    CONNECTION_STATE_IDLE,
+    CONNECTION_STATE_SENDING,
+    CONNECTION_STATE_SENT,
+    CONNECTION_STATE_FAILED
+};
+
 /*****************************************************************************/
 /* PUBLIC STRUCTS                                                            */
 /*****************************************************************************/
@@ -40,7 +48,7 @@ void connection_init(void);
 
 void connection_start_sending(uint8_t *buffer, const uint16_t length);
 
-bool_t connection_has_finished_sending(void);
+enum connection_state connection_get_state(void);
 
 #ifdef	__cplusplus
 }

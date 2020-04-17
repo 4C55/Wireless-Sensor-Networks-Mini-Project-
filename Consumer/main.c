@@ -15,7 +15,10 @@ void input_callback(
   const linkaddr_t *src,
   const linkaddr_t *dest)
 {
-  printf("Received %d bytes\n", len);
+  int i = 0;
+  for (i = 0; i < len; i++) {
+    printf("%c", ((uint8_t *)data)[i]);
+  }
 }
 /*---------------------------------------------------------------------------*/
 PROCESS_THREAD(nullnet_example_process, ev, data)
@@ -28,7 +31,6 @@ PROCESS_THREAD(nullnet_example_process, ev, data)
 
   etimer_set(&periodic_timer, 10 * CLOCK_SECOND);
   while(1) {
-    printf("Running\n");
     PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&periodic_timer));
     etimer_reset(&periodic_timer);
   }

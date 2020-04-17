@@ -26,8 +26,13 @@ PROCESS_THREAD(nullnet_example_process, ev, data)
     for (j = 0; j < 2000; j = j + 100) {
       connection_start_sending(buffer + j, 100);
 
-      while (!connection_has_finished_sending()) {
+      while (connection_get_state() == CONNECTION_STATE_SENDING) {
         PROCESS_PAUSE();
+      }
+
+      if (connection_get_state() == CONNECTION_STATE_FAILED) {
+        //Repeat
+        j = j - 100;
       }
     }
   }

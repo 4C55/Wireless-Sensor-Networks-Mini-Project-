@@ -28,7 +28,7 @@
 /* PRIVATE VARIABLES                                                         */
 /*****************************************************************************/
 
-static bool_t sending;
+static enum connection_state state;
 static linkaddr_t sink_address =  {{ 0xf7, 0xc2, 0x6e, 0x14, 0x00, 0x74, 0x12, 0x00 }};
 
 /*****************************************************************************/
@@ -37,44 +37,14 @@ static linkaddr_t sink_address =  {{ 0xf7, 0xc2, 0x6e, 0x14, 0x00, 0x74, 0x12, 0
 
 void send_callback(void *ptr, int status, int transmissions)
 {
-    sending = false;
-    LOG_DBG("Send callback with flag %d\n", status);
-
-  //MAC_TX_OK,
-
-  /**< The MAC layer transmission could not be performed due to a
-     collision. */
-  //MAC_TX_COLLISION,
-
-  /**< The MAC layer did not get an acknowledgement for the packet. */
-  //MAC_TX_NOACK,
-
-  /**< The MAC layer deferred the transmission for a later time. */
-  //MAC_TX_DEFERRED,
-
-  /**< The MAC layer transmission could not be performed because of an
-     error. The upper layer may try again later. */
-  //MAC_TX_ERR,
-
-  /**< The MAC layer transmission could not be performed because of a
-     fatal error. The upper layer does not need to try again, as the
-     error will be fatal then as well. */
-  //MAC_TX_ERR_FATAL,
+    if (status == MAC_TX_OK) {
+      state = CONNECTION_STATE_SENT;
+      LOG_DBG("Successfull transmition with flag %d\n", status);
+    } else {
+      state = CONNECTION_STATE_FAILED;
+      LOG_DBG("Failed transmition with flag %d\n", status);
+    }
 }
-
-/*
-void input_callback(const void *data, uint16_t len,
-  const linkaddr_t *src, const linkaddr_t *dest)
-{
-  if(len == sizeof(unsigned)) {
-    unsigned count;
-    memcpy(&count, data, sizeof(count));
-    LOG_INFO("Received %u from ", count);
-    LOG_INFO_LLADDR(src);
-    LOG_INFO_("\n");
-  }
-}
-*/
 
 /*****************************************************************************/
 /* PUBLIC FUNCTIONS                                                          */
@@ -82,18 +52,18 @@ void input_callback(const void *data, uint16_t len,
 
 void connection_init(void)
 {
-   //nullnet_set_input_callback(input_callback);
+   state = CONNECTION_STATE_IDLE;
 }
 
 void connection_start_sending(uint8_t *buffer, const uint16_t length)
 {
     nullnet_buf = buffer;
     nullnet_len = length;
-    sending = true;
+    state = CONNECTION_STATE_SENDING;
     NETSTACK_NETWORK.output(&sink_address, send_callback);
 }
 
-bool_t connection_has_finished_sending(void)
+enum connection_state connection_get_state(void)
 {
-    return !sending;
+    return state;
 }
