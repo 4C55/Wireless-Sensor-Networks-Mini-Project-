@@ -1,6 +1,7 @@
 #include "file.h"
 #include "types.h"
 #include "contiki.h"
+#include "lena1.h"
 
 PROCESS(nullnet_example_process, "ImageUpload");
 AUTOSTART_PROCESSES(&nullnet_example_process);
