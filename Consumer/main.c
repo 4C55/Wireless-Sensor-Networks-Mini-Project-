@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 /*---------------------------------------------------------------------------*/
-PROCESS(nullnet_example_process, "NullNet broadcast example");
+PROCESS(nullnet_example_process, "Consumer");
 AUTOSTART_PROCESSES(&nullnet_example_process);
 
 /*---------------------------------------------------------------------------*/

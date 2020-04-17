@@ -5,7 +5,7 @@
 #include "net/netstack.h"
 #include "net/nullnet/nullnet.h"
 
-PROCESS(nullnet_example_process, "Nullnet");
+PROCESS(nullnet_example_process, "Producer");
 AUTOSTART_PROCESSES(&nullnet_example_process);
 
 PROCESS_THREAD(nullnet_example_process, ev, data)
