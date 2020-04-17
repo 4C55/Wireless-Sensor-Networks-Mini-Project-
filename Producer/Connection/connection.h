@@ -10,7 +10,7 @@ extern "C"
 /* INCLUDES                                                                  */
 /*****************************************************************************/
 
-#include "Types/types.h"
+#include "types.h"
 #include "contiki.h"
 #include "net/netstack.h"
 #include "net/nullnet/nullnet.h"

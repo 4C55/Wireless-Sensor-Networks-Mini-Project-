@@ -1,5 +1,5 @@
-#include "File/file.h"
-#include "Connection/connection.h"
+#include "file.h"
+#include "connection.h"
 #include "types.h"
 #include "contiki.h"
 #include "net/netstack.h"

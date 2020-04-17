@@ -10,7 +10,7 @@ extern "C"
 /* INCLUDES                                                                  */
 /*****************************************************************************/
 
-#include "Types/types.h"
+#include "types.h"
 #include "cfs/cfs.h"
 #include "cfs/cfs-coffee.h"
 #include "sys/log.h"

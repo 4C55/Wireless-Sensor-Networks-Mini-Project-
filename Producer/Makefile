@@ -2,9 +2,9 @@ CONTIKI_PROJECT = Producer
 all: $(CONTIKI_PROJECT)
 
 
-PROJECTDIRS += File
+PROJECTDIRS += ../Shared/File
+PROJECTDIRS += ../Shared/Types
 PROJECTDIRS += Connection
-PROJECTDIRS += Types
 PROJECT_SOURCEFILES += file.c
 PROJECT_SOURCEFILES += connection.c
 CONTIKI = ../..
