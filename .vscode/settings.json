@@ -24,6 +24,7 @@
         "leds.h": "c",
         "log.h": "c",
         "uip-debug.h": "c",
-        "tcp-socket.h": "c"
+        "tcp-socket.h": "c",
+        "lena.h": "c"
     }
 }

@@ -12,7 +12,7 @@
                 "isDefault": true
             },
             "options": {
-                "cwd": "${workspaceRoot}/server/"
+                "cwd": "${workspaceRoot}/Producer/"
             }
         },
         {
@@ -21,7 +21,7 @@
             "command": "make TARGET=sky PORT=/dev/ttyUSB0 login",
             "group": "test",
             "options": {
-                "cwd": "${workspaceRoot}/server/"
+                "cwd": "${workspaceRoot}/Producer/"
         }
         }
     ]
