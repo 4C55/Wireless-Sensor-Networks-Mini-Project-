@@ -12,7 +12,7 @@ extern "C"
 
 #include "types.h"
 #include "sys/log.h"
-#include "dev/serial-line.h"
+#include "dev/uart1.h"
 
 /*****************************************************************************/
 /* PUBLIC DEFINES                                                            */
@@ -35,8 +35,6 @@ extern "C"
 /*****************************************************************************/
 
 void message_init(void);
-
-void message_handle_line(char *line);
 
 #ifdef	__cplusplus
 }

@@ -32,17 +32,19 @@
 /* PRIVATE FUNCTIONS                                                         */
 /*****************************************************************************/
 
+static int serial_input_byte(unsigned char c)
+{
+    printf("got input byte: %d ('%c')\n", c, c);
+    return true;
+}
+
 /*****************************************************************************/
 /* PUBLIC FUNCTIONS                                                          */
 /*****************************************************************************/
 
 void message_init(void)
 {
-    serial_line_init();
+    uart1_set_input(serial_input_byte);
     LOG_DBG("Initialised");
 }
 
-void message_handle_line(char *line)
-{
-    LOG_DBG("%s", line);
-}
