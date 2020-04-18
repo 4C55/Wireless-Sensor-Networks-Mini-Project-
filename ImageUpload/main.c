@@ -2,6 +2,7 @@
 #include "message.h"
 #include "types.h"
 #include "contiki.h"
+#include "dev/uart.h"
 
 PROCESS(nullnet_example_process, "ImageUpload");
 AUTOSTART_PROCESSES(&nullnet_example_process);
