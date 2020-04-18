@@ -42,7 +42,13 @@ static uint32_t current_address;
 
 static int attempt_to_seek(int direction) {
     LOG_DBG("Seeking %d from current position %ld.\n", direction, current_address);
-    return cfs_seek(file_id, direction, CFS_SEEK_CUR);
+    int result = cfs_seek(file_id, direction, CFS_SEEK_CUR);
+
+    if (result == -1) {
+        LOG_DBG("Possible seek error\n");
+    }
+
+    return result;
 }
 
 static void seek_backwards(const uint32_t address) {
@@ -103,6 +109,25 @@ static int attempt_to_read(uint8_t *buffer, uint16_t length)
     return read_result;
 }
 
+static int attempt_to_write(uint8_t *buffer, uint16_t length)
+{
+    uint8_t i = 0;
+    int write_result = 0;
+
+    for (i = 0; i < MAX_NUMBER_OF_ATTEMPTS; i++) {
+        write_result = cfs_write(file_id, buffer, length);
+
+        if (write_result > 0) {
+            current_address = current_address + (uint32_t)write_result;
+            return write_result;
+        } else {
+            LOG_DBG("Error when writing.\n");
+        }
+    }
+
+    return write_result;
+}
+
 /*****************************************************************************/
 /* PUBLIC FUNCTIONS                                                          */
 /*****************************************************************************/
@@ -119,6 +144,37 @@ bool_t file_init(void)
         LOG_DBG("Failed to open\n");
         return false;
     }
+}
+
+bool_t file_write(const uint32_t address, uint8_t *buffer, uint16_t length)
+{
+    int write_result;
+    uint16_t bytes_written = 0;
+
+    /*Failed to open the file*/
+    if (file_id < 0) {
+        return false;
+    }
+
+    LOG_DBG("Attempting to write %d bytes starting at %ld\n", length, address);
+
+    seek_to(address);
+
+    while (bytes_written < length) {
+        write_result = attempt_to_write(buffer + bytes_written, length - bytes_written);
+
+        /*Failed to read*/
+        if (write_result < 0) {
+            LOG_DBG("Failed to write\n");
+            return false;
+        }
+
+        bytes_written = bytes_written + (uint16_t)write_result;
+    }
+
+    LOG_DBG("Successfully completed wrting\n");
+
+    return true;
 }
 
 bool_t file_read(const uint32_t address, uint8_t *buffer, uint16_t length)
@@ -150,4 +206,12 @@ bool_t file_read(const uint32_t address, uint8_t *buffer, uint16_t length)
     LOG_DBG("Successfully completed reading\n");
 
     return true;
+}
+
+void file_format_memory(void)
+{
+    LOG_DBG("Starting to format the memory\n");
+    cfs_coffee_format();
+    current_address = 0;
+    LOG_DBG("Finished formatting the memory\n");
 }
