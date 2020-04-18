@@ -128,6 +128,16 @@ static int attempt_to_write(uint8_t *buffer, uint16_t length)
     return write_result;
 }
 
+static bool_t can_work_on_file(void)
+{
+    if (file_id < 0) {
+        LOG_ERR("Failed to open\n");
+        return false;
+    } else {
+        return true;
+    }
+}
+
 /*****************************************************************************/
 /* PUBLIC FUNCTIONS                                                          */
 /*****************************************************************************/
@@ -141,7 +151,7 @@ bool_t file_init(void)
         LOG_DBG("Successfully opened\n");
         return true;
     } else {
-        LOG_DBG("Failed to open\n");
+        LOG_ERR("Failed to open\n");
         return false;
     }
 }
@@ -151,8 +161,7 @@ bool_t file_write(const uint32_t address, uint8_t *buffer, uint16_t length)
     int write_result;
     uint16_t bytes_written = 0;
 
-    /*Failed to open the file*/
-    if (file_id < 0) {
+    if (!can_work_on_file()) {
         return false;
     }
 
@@ -182,8 +191,7 @@ bool_t file_read(const uint32_t address, uint8_t *buffer, uint16_t length)
     int read_result;
     uint16_t bytes_read = 0;
 
-    /*Failed to open the file*/
-    if (file_id < 0) {
+    if (!can_work_on_file()) {
         return false;
     }
 
