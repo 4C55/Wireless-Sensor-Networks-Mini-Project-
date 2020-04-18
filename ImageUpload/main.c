@@ -18,12 +18,7 @@ PROCESS_THREAD(nullnet_example_process, ev, data)
 
   while(1) {
     PROCESS_PAUSE();
-    /*
-    PROCESS_WAIT_EVENT();
-    if(ev == serial_line_event_message) {
-      message_handle_line((char *)data);
-    }
-    */
+    message_process();
   }
 
   PROCESS_END();

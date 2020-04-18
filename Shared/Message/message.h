@@ -13,6 +13,7 @@ extern "C"
 #include "types.h"
 #include "sys/log.h"
 #include "dev/uart1.h"
+#include "circullar_buffer.h"
 
 /*****************************************************************************/
 /* PUBLIC DEFINES                                                            */
@@ -35,6 +36,8 @@ extern "C"
 /*****************************************************************************/
 
 void message_init(void);
+
+void message_process(void);
 
 #ifdef	__cplusplus
 }
