@@ -39,7 +39,10 @@ static uint8_t data_buffer[SIZE_OF_UART_BUFFER];
 
 static int serial_input_byte(unsigned char c)
 {
-    (void)circullar_buffer_put(&buffer, &c);
+    if (!circullar_buffer_put(&buffer, &c)) {
+        LOG_ERR("UART buffer overrun\n");
+    }
+
     return true;
 }
 
@@ -56,7 +59,8 @@ void message_init(void)
 	    SIZE_OF_UART_BUFFER,
 	    1);
 
-    LOG_DBG("Initialised");
+    LOG_DBG("Initialised\n");
+    LOG_DBG("Mesage size: %d", sizeof(struct message));
 }
 
 void message_process(void)

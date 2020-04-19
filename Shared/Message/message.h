@@ -14,6 +14,7 @@ extern "C"
 #include "sys/log.h"
 #include "dev/uart1.h"
 #include "circullar_buffer.h"
+#include "message_handler.h"
 
 /*****************************************************************************/
 /* PUBLIC DEFINES                                                            */
