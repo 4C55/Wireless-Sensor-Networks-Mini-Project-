@@ -16,9 +16,29 @@ PROCESS_THREAD(nullnet_example_process, ev, data)
   
   PROCESS_PAUSE();
 
+  static struct message received;
+  static struct message reply;
+  
   while(1) {
     PROCESS_PAUSE();
     message_process();
+    
+    if (!message_get(&received)) {
+      continue;
+    }
+
+    switch (received.type.type_value)
+    {
+      case MESSAGE_TYPE_TEST_REQUEST:
+      {
+        message_send(&reply, MESSAGE_TYPE_TEST_RESPONSE, 0);
+        break;
+      }
+      default:
+      {
+        break;
+      }
+    }
   }
 
   PROCESS_END();

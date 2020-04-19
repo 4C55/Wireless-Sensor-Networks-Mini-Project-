@@ -40,6 +40,15 @@ void message_init(void);
 
 void message_process(void);
 
+bool_t message_get(struct message *received);
+
+void message_send_message(struct message *message);
+
+void message_send(
+    struct message *message,
+    const uint16_t type,
+    const uint8_t length);
+
 #ifdef	__cplusplus
 }
 #endif
