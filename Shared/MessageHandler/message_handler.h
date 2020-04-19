@@ -16,34 +16,42 @@
 //--------------------------------------------------------ENUMS-------------------------------------------------------//
 
 enum message_address {
-	MESSAGE_ADDRESS_MOTE,
-	MESSAGE_ADDRESS_PC
+	MESSAGE_ADDRESS_MOTE = 0,
+	MESSAGE_ADDRESS_PC = 1
 };
 
 enum message_type_value {
 	MESSAGE_TYPE_EMPTY = 0,
 	MESSAGE_TYPE_TEST_REQUEST = 1,
 	MESSAGE_TYPE_TEST_RESPONSE = 2,
+	MESSAGE_TYPE_WRITE_REQUEST = 3,
+	MESSAGE_TYPE_WRITE_RESPONE = 4,
 	NUMBER_OF_MESSAGE_TYPES
 };
 
 enum message_handler_state {
-	MESSAGE_HANDLER_RECEIVING_START,
-	MESSAGE_HANDLER_RECEIVING_TYPE_1,
-	MESSAGE_HANDLER_RECEIVING_TYPE_2,
-	MESSAGE_HANDLER_RECEIVING_SOURCE,
-	MESSAGE_HANDLER_RECEIVING_DESTINATION,
-	MESSAGE_HANDLER_RECEIVING_LENGTH,
-	MESSAGE_HANDLER_RECEIVING_DATA,
-	MESSAGE_HANDLER_RECEIVING_CRC,
-	MESSAGE_HANDLER_RECEIVING_END,
+	MESSAGE_HANDLER_RECEIVING_START = 0,
+	MESSAGE_HANDLER_RECEIVING_TYPE_1 = 1,
+	MESSAGE_HANDLER_RECEIVING_TYPE_2 = 2,
+	MESSAGE_HANDLER_RECEIVING_SOURCE = 3,
+	MESSAGE_HANDLER_RECEIVING_DESTINATION = 4,
+	MESSAGE_HANDLER_RECEIVING_LENGTH = 5,
+	MESSAGE_HANDLER_RECEIVING_DATA = 6,
+	MESSAGE_HANDLER_RECEIVING_CRC = 7,
+	MESSAGE_HANDLER_RECEIVING_END = 8,
 };
 
 //-------------------------------------------------------STRUCTS------------------------------------------------------//
 
 #pragma pack(push, 1)
+struct write_request
+{
+	uint32_t dummy;
+};
+
 union message_data {
 	uint8_t raw_data[SIZE_OF_MESSAGE_DATA];
+	struct write_request write_req;
 };
 
 union message_type {
