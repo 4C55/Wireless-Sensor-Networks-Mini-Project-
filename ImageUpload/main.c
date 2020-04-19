@@ -34,6 +34,11 @@ PROCESS_THREAD(nullnet_example_process, ev, data)
         message_send(&reply, MESSAGE_TYPE_TEST_RESPONSE, 0);
         break;
       }
+      case MESSAGE_TYPE_WRITE_REQUEST:
+      {
+        message_send(&reply, MESSAGE_TYPE_WRITE_RESPONE, 0);
+        break;
+      }
       default:
       {
         break;
