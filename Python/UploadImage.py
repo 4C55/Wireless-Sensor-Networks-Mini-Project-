@@ -1,12 +1,13 @@
 import MessageType
+import Messages
 from MessageHandler import MessageHandler
 from Message import Message
 
 def main():
     handler = MessageHandler('COM8')
-    message = Message(MessageType.MESSAGE_TYPE_TEST_REQUEST)
-    handler.send(message)
-
+    message = Messages.WriteRequest(address=10000000)
+    reply = handler.send(message, MessageType.MESSAGE_TYPE_WRITE_RESPONSE)
+    print(reply)
     handler.dispose()
 
 

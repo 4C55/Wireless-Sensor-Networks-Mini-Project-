@@ -2,6 +2,9 @@ import serial
 import Message
 from datetime import datetime
 import MessageHandlerState
+import MessageType
+import MessageAddress
+import Messages
 
 class MessageHandler:
     def __init__(
@@ -128,19 +131,54 @@ class MessageHandler:
             return output
 
     def handle_valid_message(self):
-        return None
+        if self.message_type == MessageType.MESSAGE_TYPE_TEST_REQUEST:
+            return Messages.TestRequest(
+                source=self.source,
+                destination=self.destination,
+                data=self.data)
+        elif self.message_type == MessageType.MESSAGE_TYPE_TEST_RESPONSE:
+            return Messages.TestResponse(
+                source=self.source,
+                destination=self.destination,
+                data=self.data)
+        elif self.message_type == MessageType.MESSAGE_TYPE_WRITE_RESPONSE:
+            return Messages.WriteResponse(
+                source=self.source,
+                destination=self.destination,
+                data=self.data)
+        else:
+            return None
 
 
-    def send(self, message, timeout_s=3):
+    def send(self,
+             message,
+             expected_response,
+             expected_source=MessageAddress.MESSAGE_ADDRESS_MOTE,
+             expected_destination=MessageAddress.MESSAGE_ADDRESS_PC,
+             timeout_s=3):
         self.reset_message_parsing_state()
         self.port.write(message.get_bytes())
         self.port.flush()
 
         start = datetime.now()
+        response = None
         while (datetime.now() - start).total_seconds() < timeout_s:
             received_byte = self.port.read(size=1)
             if len(received_byte) == 1:
-                self.parse_byte(received_byte)
+                response = self.parse_byte(received_byte)
+                if response is not None:
+                    break
+
+        if (
+                response is not None and
+                response.message_type == expected_response and
+                response.source == expected_source and
+                response.destination == expected_destination):
+            return response
+        else:
+            return None
+
+
 
 
     def dispose(self):

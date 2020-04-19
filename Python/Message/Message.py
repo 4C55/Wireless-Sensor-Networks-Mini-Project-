@@ -21,11 +21,12 @@ class Message:
             self,
             message_type=MessageType.MESSAGE_TYPE_EMPTY,
             source=MessageAddress.MESSAGE_ADDRESS_PC,
-            destination=MessageAddress.MESSAGE_ADDRESS_MOTE):
+            destination=MessageAddress.MESSAGE_ADDRESS_MOTE,
+            data=[]):
         self.message_type = message_type
         self.source = source
         self.destination = destination
-        self.data = []
+        self.data = data
 
     def get_bytes(self):
         output = []
