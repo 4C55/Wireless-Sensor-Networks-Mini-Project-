@@ -5,9 +5,15 @@ from Message import Message
 
 def main():
     handler = MessageHandler('COM8')
-    message = Messages.WriteRequest(address=10000000)
+    data = []
+    data.append(170)
+
+    message = Messages.WriteRequest(
+        address=0,
+        length=1,
+        write_data=data)
     reply = handler.send(message, MessageType.MESSAGE_TYPE_WRITE_RESPONSE)
-    print(reply)
+    print(reply.success)
     handler.dispose()
 
 

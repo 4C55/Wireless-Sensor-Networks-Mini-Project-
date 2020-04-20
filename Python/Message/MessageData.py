@@ -12,6 +12,20 @@ class MessageDataBuilder:
     def add_uint8_t(self, value):
         self.data.append((value >> 0) & 0xff)
 
+    def add_uint16_t(self, value):
+        self.data.append((value >> 0) & 0xff)
+        self.data.append((value >> 8) & 0xff)
+
+    def add_byte_array(self, value):
+        for data in value:
+            self.add_uint8_t(data)
+
+    def add_bool_t(self, value):
+        if value:
+            self.add_uint8_t(1)
+        else:
+            self.add_uint8_t(0)
+
     def get_data(self):
         return self.data
 
@@ -22,6 +36,14 @@ class MessageDataReader:
             data):
         self.data = data
         self.current_index = 0
+
+    def get_bool_t(self):
+        flag = self.get_uint8_t()
+
+        if flag == 1:
+            return True
+        else:
+            return False
 
     def get_uint32_t(self):
         result = 0
