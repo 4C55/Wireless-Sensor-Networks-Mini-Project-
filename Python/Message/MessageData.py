@@ -16,7 +16,7 @@ class MessageDataBuilder:
         self.data.append((value >> 0) & 0xff)
         self.data.append((value >> 8) & 0xff)
 
-    def add_byte_array(self, value):
+    def add_uint8_t_array(self, value):
         for data in value:
             self.add_uint8_t(data)
 
@@ -57,7 +57,21 @@ class MessageDataReader:
         self.current_index = self.current_index + 1
         return result
 
+    def get_uint16_t(self):
+        result = 0
+        result = result | (self.data[self.current_index] << 0)
+        self.current_index = self.current_index + 1
+        result = result | (self.data[self.current_index] << 8)
+        self.current_index = self.current_index + 1
+        return result
+
     def get_uint8_t(self):
         self.current_index = self.current_index + 1
         return self.data[self.current_index - 1]
+
+    def get_uint8_t_array(self, length):
+        output = []
+        for i in range(length):
+            output.append(self.get_uint8_t())
+        return output
 

@@ -38,7 +38,6 @@ class WriteRequest(Message):
             destination=MessageAddress.MESSAGE_ADDRESS_MOTE,
             data=None,
             address=0,
-            length=0,
             write_data=None):
         if data is None:
             builder = MessageDataBuilder()
@@ -46,17 +45,19 @@ class WriteRequest(Message):
             self.address = address
             builder.add_uint32_t(self.address)
 
-            self.length = length
-            builder.add_uint16_t(length)
+            self.length = len(write_data)
+            builder.add_uint16_t(self.length)
 
             self.write_data = write_data
-            builder.add_byte_array(self.write_data)
+            builder.add_uint8_t_array(self.write_data)
 
             message_data = builder.get_data()
         else:
             reader = MessageDataReader(data)
 
             self.address = reader.get_uint32_t()
+            self.length = reader.get_uint16_t()
+            self.write_data = reader.get_uint8_t_array(self.length)
 
             message_data = data
         super(WriteRequest, self).__init__(
@@ -91,3 +92,69 @@ class WriteResponse(Message):
             source=source,
             destination=destination,
             data=message_data)
+
+
+class ReadRequest(Message):
+    def __init__(
+            self,
+            source=MessageAddress.MESSAGE_ADDRESS_PC,
+            destination=MessageAddress.MESSAGE_ADDRESS_MOTE,
+            data=None,
+            address=0,
+            length=0):
+        if data is None:
+            builder = MessageDataBuilder()
+
+            self.address = address
+            builder.add_uint32_t(self.address)
+
+            self.length = length
+            builder.add_uint16_t(length)
+
+            message_data = builder.get_data()
+        else:
+            reader = MessageDataReader(data)
+
+            self.address = reader.get_uint32_t()
+            self.length = reader.get_uint16_t()
+
+            message_data = data
+        super(ReadRequest, self).__init__(
+            message_type=MessageType.MESSAGE_TYPE_READ_REQUEST,
+            source=source,
+            destination=destination,
+            data=message_data)
+
+
+class ReadResponse(Message):
+    def __init__(
+            self,
+            source=MessageAddress.MESSAGE_ADDRESS_PC,
+            destination=MessageAddress.MESSAGE_ADDRESS_MOTE,
+            data=None,
+            length=0,
+            read_data=[]):
+        if data is None:
+            builder = MessageDataBuilder()
+
+            self.length = length
+            builder.add_uint16_t(length)
+
+            self.read_data = read_data
+            builder.add_uint8_t_array(self.read_data)
+
+            message_data = builder.get_data()
+        else:
+            reader = MessageDataReader(data)
+
+            self.length = reader.get_uint16_t()
+            self.read_data = reader.get_uint8_t_array(self.length)
+
+            message_data = data
+        super(ReadResponse, self).__init__(
+            message_type=MessageType.MESSAGE_TYPE_READ_RESPONSE,
+            source=source,
+            destination=destination,
+            data=message_data)
+
+

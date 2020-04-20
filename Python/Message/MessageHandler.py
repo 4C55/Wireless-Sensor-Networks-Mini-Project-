@@ -6,6 +6,36 @@ import MessageType
 import MessageAddress
 import Messages
 
+MESSAGE_START = 0x02
+MESSAGE_END = 0x03
+
+
+def get_message_bytes(message):
+    output = []
+    output.append(message.message_type & 0xff)
+    output.append((message.message_type >> 8) & 0xff)
+    output.append(message.source)
+    output.append(message.destination)
+    output.append(len(message.data))
+    for data in message.data:
+        output.append(data)
+
+    crc = 0xAA
+    for i in range(0, len(output)):
+        crc = crc ^ output[i]
+    output.append(crc)
+    return output
+
+
+def get_transmition_byte(message_bytes):
+    output = []
+    for data in message_bytes:
+        if data == MESSAGE_START:
+            output.append(MESSAGE_START)
+        output.append(data)
+    return [MESSAGE_START] + output + [MESSAGE_END]
+
+
 class MessageHandler:
     def __init__(
             self,
@@ -26,13 +56,13 @@ class MessageHandler:
 
     def is_padding(self, byte):
         if self.padding:
-            if byte ==  Message.MESSAGE_START:
+            if byte == MESSAGE_START:
                 self.padding = False
                 return False
             else:
                 self.reset_message_parsing_state()
                 return True
-        elif byte == Message.MESSAGE_START:
+        elif byte == MESSAGE_START:
             self.padding = True
             return True
 
@@ -61,7 +91,7 @@ class MessageHandler:
 
         # MESSAGE_HANDLER_RECEIVING_START
         if self.parsing_state == MessageHandlerState.MESSAGE_HANDLER_RECEIVING_START:
-            if byte == Message.MESSAGE_START:
+            if byte == MESSAGE_START:
                 self.parsing_state = MessageHandlerState.MESSAGE_HANDLER_RECEIVING_TYPE_1
                 return None
         # MESSAGE_HANDLER_RECEIVING_TYPE_1
@@ -124,7 +154,7 @@ class MessageHandler:
         # MESSAGE_HANDLER_RECEIVING_END
         elif self.parsing_state == MessageHandlerState.MESSAGE_HANDLER_RECEIVING_END:
             output = None
-            if byte == Message.MESSAGE_END:
+            if byte == MESSAGE_END:
                 output = self.handle_valid_message()
 
             self.reset_message_parsing_state()
@@ -146,18 +176,50 @@ class MessageHandler:
                 source=self.source,
                 destination=self.destination,
                 data=self.data)
+        elif self.message_type == MessageType.MESSAGE_TYPE_WRITE_REQUEST:
+            return Messages.WriteRequest(
+                source=self.source,
+                destination=self.destination,
+                data=self.data)
+        elif self.message_type == MessageType.MESSAGE_TYPE_READ_REQUEST:
+            return Messages.ReadRequest(
+                source=self.source,
+                destination=self.destination,
+                data=self.data)
+        elif self.message_type == MessageType.MESSAGE_TYPE_READ_RESPONSE:
+            return Messages.ReadResponse(
+                source=self.source,
+                destination=self.destination,
+                data=self.data)
         else:
             return None
 
+    def send_and_wait(
+            self,
+            message,
+            expected_response,
+            expected_source=MessageAddress.MESSAGE_ADDRESS_MOTE,
+            expected_destination=MessageAddress.MESSAGE_ADDRESS_PC,
+            timeout_s=3,
+            attempts=3):
+        for i in range(attempts):
+            result = self.transmit_and_wait(message, expected_response, expected_source, expected_destination, timeout_s)
+            if result is not None:
+                return result
+        return None
 
-    def send(self,
-             message,
-             expected_response,
-             expected_source=MessageAddress.MESSAGE_ADDRESS_MOTE,
-             expected_destination=MessageAddress.MESSAGE_ADDRESS_PC,
-             timeout_s=3):
+    def transmit_and_wait(
+            self,
+            message,
+            expected_response,
+            expected_source=MessageAddress.MESSAGE_ADDRESS_MOTE,
+            expected_destination=MessageAddress.MESSAGE_ADDRESS_PC,
+            timeout_s=3):
+        message_bytes = get_message_bytes(message)
+        transmition_bytes = get_transmition_byte(message_bytes)
+
         self.reset_message_parsing_state()
-        self.port.write(message.get_bytes())
+        self.port.write(transmition_bytes)
         self.port.flush()
 
         start = datetime.now()
