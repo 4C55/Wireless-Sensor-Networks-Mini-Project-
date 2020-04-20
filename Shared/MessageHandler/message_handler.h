@@ -46,12 +46,20 @@ enum message_handler_state {
 #pragma pack(push, 1)
 struct write_request
 {
-	uint32_t dummy;
+	uint32_t address;
+	uint16_t length;
+	uint8_t write_data[SIZE_OF_MESSAGE_DATA - 6];
+};
+
+struct write_reply
+{
+	uint8_t success;
 };
 
 union message_data {
 	uint8_t raw_data[SIZE_OF_MESSAGE_DATA];
 	struct write_request write_req;
+	struct write_reply write_rep;
 };
 
 union message_type {
