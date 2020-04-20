@@ -26,6 +26,8 @@ enum message_type_value {
 	MESSAGE_TYPE_TEST_RESPONSE = 2,
 	MESSAGE_TYPE_WRITE_REQUEST = 3,
 	MESSAGE_TYPE_WRITE_RESPONE = 4,
+	MESSAGE_TYPE_READ_REQUEST = 5,
+	MESSAGE_TYPE_READ_RESPONSE = 6,
 	NUMBER_OF_MESSAGE_TYPES
 };
 
@@ -51,15 +53,29 @@ struct write_request
 	uint8_t write_data[SIZE_OF_MESSAGE_DATA - 6];
 };
 
+struct read_request
+{
+	uint32_t address;
+	uint16_t length;
+};
+
+struct read_reply
+{
+	uint16_t length;
+	uint8_t read_data[SIZE_OF_MESSAGE_DATA - 2];
+};
+
 struct write_reply
 {
-	uint8_t success;
+	bool_t success;
 };
 
 union message_data {
 	uint8_t raw_data[SIZE_OF_MESSAGE_DATA];
 	struct write_request write_req;
 	struct write_reply write_rep;
+	struct read_request read_req;
+	struct read_reply read_rep;
 };
 
 union message_type {

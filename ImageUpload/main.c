@@ -21,6 +21,8 @@ PROCESS_THREAD(nullnet_example_process, ev, data)
 
   static struct message received;
   static struct message reply;
+  static uint8_t reply_type = MESSAGE_TYPE_EMPTY;
+  static uint8_t reply_length;
 
   while(1) {
     PROCESS_PAUSE();
@@ -34,7 +36,8 @@ PROCESS_THREAD(nullnet_example_process, ev, data)
     {
       case MESSAGE_TYPE_TEST_REQUEST:
       {
-        message_send(&reply, MESSAGE_TYPE_TEST_RESPONSE, 0);
+        reply_type = MESSAGE_TYPE_TEST_RESPONSE;
+        reply_length = 0;
         break;
       }
       case MESSAGE_TYPE_WRITE_REQUEST:
@@ -43,11 +46,25 @@ PROCESS_THREAD(nullnet_example_process, ev, data)
           received.data.write_req.address,
           received.data.write_req.write_data,
           received.data.write_req.length);
+
+        reply_type = MESSAGE_TYPE_WRITE_RESPONE;
+        reply_length = sizeof(reply.data.write_rep);
+        break;
+      }
+      case MESSAGE_TYPE_READ_REQUEST:
+      {
+        reply.data.read_rep.length = received.data.read_req.length;
+        bool_t success = file_read(
+          received.data.read_req.address,
+          reply.data.read_rep.read_data,
+          received.data.read_req.length);
+
+        if (!success) {
+          break;
+        }
         
-        message_send(
-          &reply,
-          MESSAGE_TYPE_WRITE_RESPONE,
-          sizeof(reply.data.write_rep));
+        reply_type = MESSAGE_TYPE_READ_RESPONSE;
+        reply_length = sizeof(reply.data.read_rep);
         break;
       }
       default:
@@ -55,6 +72,18 @@ PROCESS_THREAD(nullnet_example_process, ev, data)
         break;
       }
     }
+
+    PROCESS_PAUSE();
+    
+    if (reply_type == MESSAGE_TYPE_EMPTY) {
+      continue;
+    }
+
+    message_send(
+          &reply,
+          reply_type,
+          reply_length);
+    reply_type = MESSAGE_TYPE_EMPTY;
   }
 
   PROCESS_END();
