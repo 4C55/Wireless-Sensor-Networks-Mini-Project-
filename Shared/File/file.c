@@ -216,10 +216,11 @@ bool_t file_read(const uint32_t address, uint8_t *buffer, uint16_t length)
     return true;
 }
 
-void file_format_memory(void)
+bool_t file_format_memory(void)
 {
     LOG_DBG("Starting to format the memory\n");
     cfs_coffee_format();
-    current_address = 0;
     LOG_DBG("Finished formatting the memory\n");
+
+    return file_init();
 }

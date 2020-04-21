@@ -249,7 +249,6 @@ static void massage_handler_put_byte(
 			return;
 		}
 
-		reset_message_channel(channel);
 		break;
 	}
 	case MESSAGE_HANDLER_RECEIVING_CRC: {

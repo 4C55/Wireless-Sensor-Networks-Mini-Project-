@@ -8,7 +8,7 @@
 
 //-------------------------------------------------------DEFINES------------------------------------------------------//
 
-#define SIZE_OF_MESSAGE_DATA 32
+#define SIZE_OF_MESSAGE_DATA 249
 #define SIZE_OF_EMPTY_MESSAGE 6 //Start + Type + Length + check  sum + End
 #define SIZE_OF_EMPTY_DATA 0
 #define SIZE_OF_MESSAGE_TYPE 2
@@ -28,6 +28,8 @@ enum message_type_value {
 	MESSAGE_TYPE_WRITE_RESPONE = 4,
 	MESSAGE_TYPE_READ_REQUEST = 5,
 	MESSAGE_TYPE_READ_RESPONSE = 6,
+	MESSAGE_TYPE_FORMAT_REQUEST = 7,
+	MESSAGE_TYPE_FORMAT_RESPONSE = 8,
 	NUMBER_OF_MESSAGE_TYPES
 };
 
@@ -70,12 +72,18 @@ struct write_reply
 	bool_t success;
 };
 
+struct format_reply
+{
+	bool_t success;
+};
+
 union message_data {
 	uint8_t raw_data[SIZE_OF_MESSAGE_DATA];
 	struct write_request write_req;
 	struct write_reply write_rep;
 	struct read_request read_req;
 	struct read_reply read_rep;
+	struct format_reply format_rep;
 };
 
 union message_type {

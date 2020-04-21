@@ -13,7 +13,6 @@ PROCESS_THREAD(nullnet_example_process, ev, data)
 
   file_init();
   message_init();
-
   //leds_on(LEDS_GREEN);
   PROCESS_PAUSE();
   
@@ -65,6 +64,14 @@ PROCESS_THREAD(nullnet_example_process, ev, data)
         
         reply_type = MESSAGE_TYPE_READ_RESPONSE;
         reply_length = sizeof(reply.data.read_rep);
+        break;
+      }
+      case MESSAGE_TYPE_FORMAT_REQUEST:
+      {
+        reply.data.format_rep.success = file_format_memory();
+        
+        reply_type = MESSAGE_TYPE_FORMAT_RESPONSE;
+        reply_length = sizeof(reply.data.format_rep);
         break;
       }
       default:

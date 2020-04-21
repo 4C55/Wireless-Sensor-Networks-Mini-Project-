@@ -13,7 +13,7 @@
 #define LOG_LEVEL LOG_CONF_LEVEL_MESSAGE
 
 #define SIZE_OF_UART_BUFFER sizeof(struct message)
-#define SIZE_OF_MESSAGE_DATA_BUFFER (2 * sizeof(struct message))
+#define SIZE_OF_MESSAGE_DATA_BUFFER (sizeof(struct message))
 
 /*****************************************************************************/
 /* PRIVATE ENUMERATIONS                                                      */
