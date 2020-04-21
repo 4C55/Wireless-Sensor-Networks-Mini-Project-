@@ -41,7 +41,7 @@ bool_t file_read(const uint32_t address, uint8_t *buffer, uint16_t length);
 
 bool_t file_write(const uint32_t address, uint8_t *buffer, uint16_t length);
 
-void file_format_memory(void);
+bool_t file_format_memory(void);
 
 #ifdef	__cplusplus
 }
