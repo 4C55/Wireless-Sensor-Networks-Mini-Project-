@@ -1,8 +1,8 @@
-import MessageType
-import MessageAddress
-from MessageData import MessageDataBuilder
-from MessageData import MessageDataReader
-from Message import Message
+from Message import MessageType
+from Message import MessageAddress
+from Message.MessageData import MessageDataBuilder
+from Message.MessageData import MessageDataReader
+from Message.Message import Message
 
 
 class TestRequest(Message):
@@ -64,7 +64,9 @@ class WriteRequest(Message):
             message_type=MessageType.MESSAGE_TYPE_WRITE_REQUEST,
             source=source,
             destination=destination,
-            data=message_data)
+            data=message_data,
+            timeout=15,
+            attempts=2)
 
 
 class WriteResponse(Message):
@@ -153,6 +155,48 @@ class ReadResponse(Message):
             message_data = data
         super(ReadResponse, self).__init__(
             message_type=MessageType.MESSAGE_TYPE_READ_RESPONSE,
+            source=source,
+            destination=destination,
+            data=message_data)
+
+
+class FormatRequest(Message):
+    def __init__(
+            self,
+            source=MessageAddress.MESSAGE_ADDRESS_PC,
+            destination=MessageAddress.MESSAGE_ADDRESS_MOTE,
+            data=[]):
+        super(FormatRequest, self).__init__(
+            message_type=MessageType.MESSAGE_TYPE_FORMAT_REQUEST,
+            source=source,
+            destination=destination,
+            data=data,
+            timeout=20,
+            attempts=2)
+
+
+class FormatResponse(Message):
+    def __init__(
+            self,
+            source=MessageAddress.MESSAGE_ADDRESS_PC,
+            destination=MessageAddress.MESSAGE_ADDRESS_MOTE,
+            data=[],
+            success=True):
+        if data is None:
+            builder = MessageDataBuilder()
+
+            self.success = success
+            builder.add_bool_t(success)
+
+            message_data = builder.get_data()
+        else:
+            reader = MessageDataReader(data)
+
+            self.success = reader.get_bool_t()
+
+            message_data = data
+        super(FormatResponse, self).__init__(
+            message_type=MessageType.MESSAGE_TYPE_FORMAT_RESPONSE,
             source=source,
             destination=destination,
             data=message_data)

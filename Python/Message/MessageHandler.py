@@ -1,10 +1,10 @@
 import serial
-import Message
+from Message import Message
 from datetime import datetime
-import MessageHandlerState
-import MessageType
-import MessageAddress
-import Messages
+from Message import MessageHandlerState
+from Message import MessageType
+from Message import MessageAddress
+from Message import Messages
 
 MESSAGE_START = 0x02
 MESSAGE_END = 0x03
@@ -41,7 +41,7 @@ class MessageHandler:
             self,
             port):
         self.port = serial.Serial()
-        self.port.baudrate = 115200
+        self.port.baudrate = 57600
         self.port.port = port
         self.port.timeout = 0.01
         self.port.open()
@@ -191,6 +191,16 @@ class MessageHandler:
                 source=self.source,
                 destination=self.destination,
                 data=self.data)
+        elif self.message_type == MessageType.MESSAGE_TYPE_FORMAT_REQUEST:
+            return Messages.FormatRequest(
+                source=self.source,
+                destination=self.destination,
+                data=self.data)
+        elif self.message_type == MessageType.MESSAGE_TYPE_FORMAT_RESPONSE:
+            return Messages.FormatResponse(
+                source=self.source,
+                destination=self.destination,
+                data=self.data)
         else:
             return None
 
@@ -199,11 +209,14 @@ class MessageHandler:
             message,
             expected_response,
             expected_source=MessageAddress.MESSAGE_ADDRESS_MOTE,
-            expected_destination=MessageAddress.MESSAGE_ADDRESS_PC,
-            timeout_s=3,
-            attempts=3):
-        for i in range(attempts):
-            result = self.transmit_and_wait(message, expected_response, expected_source, expected_destination, timeout_s)
+            expected_destination=MessageAddress.MESSAGE_ADDRESS_PC):
+        for i in range(message.attempts):
+            result = self.transmit_and_wait(
+                message,
+                expected_response,
+                expected_source,
+                expected_destination,
+                message.timeout)
             if result is not None:
                 return result
         return None
@@ -217,9 +230,8 @@ class MessageHandler:
             timeout_s=3):
         message_bytes = get_message_bytes(message)
         transmition_bytes = get_transmition_byte(message_bytes)
-
-        self.reset_message_parsing_state()
         self.port.write(transmition_bytes)
+        self.reset_message_parsing_state()
         self.port.flush()
 
         start = datetime.now()
