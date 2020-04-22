@@ -89,6 +89,8 @@ class MessageHandler:
     def parse_byte(self, byte):
         byte = int.from_bytes(byte, byteorder='little')
 
+        print('%c' % byte, end='')
+
         # MESSAGE_HANDLER_RECEIVING_START
         if self.parsing_state == MessageHandlerState.MESSAGE_HANDLER_RECEIVING_START:
             if byte == MESSAGE_START:
@@ -241,6 +243,7 @@ class MessageHandler:
         message_bytes = get_message_bytes(message)
 
         transmition_bytes = get_transmition_byte(message_bytes)
+        print(transmition_bytes)
         self.port.write(transmition_bytes)
         self.reset_message_parsing_state()
         self.port.flush()
