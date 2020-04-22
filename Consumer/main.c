@@ -1,6 +1,7 @@
 #include "contiki.h"
 #include "net/netstack.h"
 #include "net/nullnet/nullnet.h"
+#include "dev/leds.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -17,7 +18,7 @@ void input_callback(
 {
   int i = 0;
   for (i = 0; i < len; i++) {
-    printf("%c", ((uint8_t *)data)[i]);
+    putchar(((uint8_t *)data)[i]);
   }
 }
 /*---------------------------------------------------------------------------*/
@@ -29,8 +30,9 @@ PROCESS_THREAD(nullnet_example_process, ev, data)
 
   nullnet_set_input_callback(input_callback);
 
-  etimer_set(&periodic_timer, 10 * CLOCK_SECOND);
+  etimer_set(&periodic_timer, 1 * CLOCK_SECOND);
   while(1) {
+    leds_toggle(LEDS_GREEN);
     PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&periodic_timer));
     etimer_reset(&periodic_timer);
   }
