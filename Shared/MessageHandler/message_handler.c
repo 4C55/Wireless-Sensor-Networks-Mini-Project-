@@ -280,31 +280,6 @@ static void massage_handler_put_byte(
 	}
 }
 
-/**
- * @brief Transmits a message through a message channel.
- *
- * @param handler The message channel to use.
- * @param message Message to send.
- */
-void transmit(
-	const struct message_handler_channel *channel,
-	const struct message *message)
-{
-    uint8_t i;
-	(void)channel->send_byte_call(MESSAGE_START);
-	send_with_padding(channel, message->type.type_bytes[0]);
-	send_with_padding(channel, message->type.type_bytes[1]);
-	send_with_padding(channel, message->source);
-	send_with_padding(channel, message->destination);
-	send_with_padding(channel, message->length);
-
-	for (i = 0; i < message->length; i++) {
-		send_with_padding(channel, message->data.raw_data[i]);
-	}
-
-	send_with_padding(channel, message_get_crc(message));
-	(void)channel->send_byte_call(MESSAGE_END);
-}
 
 //---------------------------------------------------PUBLIC FUNCTIONS-------------------------------------------------//
 
@@ -349,28 +324,24 @@ void message_handler_process(struct message_handler_channel *channel)
 			break;
 		}
     }
-
-	uint8_t number_of_messages = circullar_buffer_get_count(&(channel->outgoing_messages));
-
-	for (i = 0; i < number_of_messages; i++) {
-		struct message message;
-
-		if (!circullar_buffer_get(&(channel->outgoing_messages), &message)) {
-			break;
-		}
-
-        transmit(channel, &message);
-	}
 }
 
 void message_handler_send(struct message_handler_channel *channel, struct message *message)
 {
-	if (message->length > SIZE_OF_MESSAGE_DATA) {
-		return;
+	uint8_t i;
+	(void)channel->send_byte_call(MESSAGE_START);
+	send_with_padding(channel, message->type.type_bytes[0]);
+	send_with_padding(channel, message->type.type_bytes[1]);
+	send_with_padding(channel, message->source);
+	send_with_padding(channel, message->destination);
+	send_with_padding(channel, message->length);
+
+	for (i = 0; i < message->length; i++) {
+		send_with_padding(channel, message->data.raw_data[i]);
 	}
 
-	message->source = channel->address;
-	circullar_buffer_put(&(channel->outgoing_messages), message);
+	send_with_padding(channel, message_get_crc(message));
+	(void)channel->send_byte_call(MESSAGE_END);
 }
 
 bool_t message_handler_receive(struct message_handler_channel *channel, struct message *message)
