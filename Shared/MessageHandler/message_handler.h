@@ -30,6 +30,8 @@ enum message_type_value {
 	MESSAGE_TYPE_READ_RESPONSE = 6,
 	MESSAGE_TYPE_FORMAT_REQUEST = 7,
 	MESSAGE_TYPE_FORMAT_RESPONSE = 8,
+	MESSAGE_SEND_TO_SINK_REQUEST = 10,
+	MESSAGE_SEND_TO_SINK_REPLY = 11,
 	NUMBER_OF_MESSAGE_TYPES
 };
 
@@ -77,6 +79,16 @@ struct format_reply
 	bool_t success;
 };
 
+struct send_to_sink_request
+{
+	uint32_t length;
+};
+
+struct send_to_sink_reply
+{
+	bool_t success;
+};
+
 union message_data {
 	uint8_t raw_data[SIZE_OF_MESSAGE_DATA];
 	struct write_request write_req;
@@ -84,6 +96,8 @@ union message_data {
 	struct read_request read_req;
 	struct read_reply read_rep;
 	struct format_reply format_rep;
+	struct send_to_sink_request send_to_sink_req;
+	struct send_to_sink_reply send_to_sink_rep;
 };
 
 union message_type {
