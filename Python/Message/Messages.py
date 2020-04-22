@@ -200,5 +200,3 @@ class FormatResponse(Message):
             source=source,
             destination=destination,
             data=message_data)
-
-

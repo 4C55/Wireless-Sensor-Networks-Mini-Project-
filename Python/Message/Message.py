@@ -18,7 +18,3 @@ class Message:
         self.data = data
         self.attempts = attempts
         self.timeout = timeout
-
-
-
-

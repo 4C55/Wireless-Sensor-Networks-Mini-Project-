@@ -253,7 +253,5 @@ class MessageHandler:
             return None
 
 
-
-
     def dispose(self):
         self.port.close()
