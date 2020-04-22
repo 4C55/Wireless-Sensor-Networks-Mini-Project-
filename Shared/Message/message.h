@@ -46,6 +46,7 @@ void message_send_message(struct message *message);
 
 void message_send(
     struct message *message,
+    const uint8_t destination,
     const uint16_t type,
     const uint8_t length);
 

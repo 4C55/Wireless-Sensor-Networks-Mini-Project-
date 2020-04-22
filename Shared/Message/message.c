@@ -34,7 +34,6 @@
 static struct circullar_buffer buffer;
 static uint8_t data_buffer[SIZE_OF_UART_BUFFER];
 static uint8_t data_in_buffer[SIZE_OF_MESSAGE_DATA_BUFFER];
-static uint8_t data_out_buffer[SIZE_OF_MESSAGE_DATA_BUFFER];
 static struct message_handler_channel channel;
 
 /*****************************************************************************/
@@ -88,9 +87,7 @@ void message_init(void)
 	    has_any_bytes_to_receive,
 	    receive_byte,
         data_in_buffer,
-        sizeof(data_in_buffer),
-        data_out_buffer,
-        sizeof(data_out_buffer));
+        sizeof(data_in_buffer));
 
     LOG_DBG("Initialised\n");
 }
@@ -112,11 +109,13 @@ void message_send_message(struct message *message)
 
 void message_send(
     struct message *message,
+    const uint8_t destination,
     const uint16_t type,
     const uint8_t length)
 {
+    message->source = MESSAGE_ADDRESS_MOTE;
     message->type.type_value = type;
-	message->destination = MESSAGE_ADDRESS_PC;
+	message->destination = destination;
 	message->length = length;
     message_handler_send(&channel, message);
 }

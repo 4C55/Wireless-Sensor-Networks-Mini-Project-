@@ -124,7 +124,6 @@ struct message_handler_channel {
 	enum message_handler_state state;
 	bool_t padding;
     struct circullar_buffer incomming_messages;
-    struct circullar_buffer outgoing_messages;
 };
 
 //---------------------------------------------------PUBLIC FUNCTIONS-------------------------------------------------//
@@ -136,9 +135,7 @@ void message_handler_init_channel(
 	bool_t (*has_any_bytes_to_receive)(void),
 	uint8_t (*receive_byte)(void),
     uint8_t *data_in_buffer,
-    uint8_t data_in_buffer_size,
-    uint8_t *data_out_buffer,
-    uint8_t data_out_buffer_size);
+    uint8_t data_in_buffer_size);
 
 void message_handler_process(struct message_handler_channel *channel);
 

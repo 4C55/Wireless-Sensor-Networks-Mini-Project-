@@ -26,9 +26,6 @@ static void massage_handler_put_byte(
 static bool_t is_in_address_list(
 	struct message_handler_channel *channel,
 	const uint8_t source_address);
-static void transmit(
-	const struct message_handler_channel *channel,
-	const struct message *message);
 
 //---------------------------------------------------PRIVATE FUNCTIONS------------------------------------------------//
 
@@ -290,9 +287,7 @@ void message_handler_init_channel(
 	bool_t (*has_any_bytes_to_receive)(void),
 	uint8_t (*receive_byte)(void),
     uint8_t *data_in_buffer,
-    uint8_t data_in_buffer_size,
-    uint8_t *data_out_buffer,
-    uint8_t data_out_buffer_size)
+    uint8_t data_in_buffer_size)
 {
 	handler->address = address;
 	handler->send_byte_call = send_single_byte;
@@ -305,17 +300,10 @@ void message_handler_init_channel(
         data_in_buffer,
         data_in_buffer_size,
 		sizeof(struct message));
-
-    circullar_buffer_init(
-		&(handler->outgoing_messages),
-        data_out_buffer,
-        data_out_buffer_size,
-		sizeof(struct message));
 }
 
 void message_handler_process(struct message_handler_channel *channel)
 {
-    uint8_t i;
 	while (true) {
         if (channel->has_any_bytes_to_receive_call()){
 			uint8_t received = channel->receive_byte_call();

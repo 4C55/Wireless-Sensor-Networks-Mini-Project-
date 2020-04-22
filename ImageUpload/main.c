@@ -19,10 +19,10 @@ PROCESS_THREAD(nullnet_example_process, ev, data)
   PROCESS_PAUSE();
 
   static struct message message;
+  static uint8_t reply_destination;
 
   while(1) {
     PROCESS_PAUSE();
-
     message_process();
     PROCESS_PAUSE();
     
@@ -30,9 +30,12 @@ PROCESS_THREAD(nullnet_example_process, ev, data)
       continue;
     }
 
+    reply_destination = message.source;
+
     if (message.type.type_value == MESSAGE_TYPE_TEST_REQUEST) {
       message_send(
           &message,
+          reply_destination,
           MESSAGE_TYPE_TEST_RESPONSE,
           0);
     } else if (message.type.type_value == MESSAGE_TYPE_WRITE_REQUEST) {
@@ -45,6 +48,7 @@ PROCESS_THREAD(nullnet_example_process, ev, data)
 
       message_send(
           &message,
+          reply_destination,
           MESSAGE_TYPE_WRITE_RESPONE,
           sizeof(message.data.write_rep));      
     } else if (message.type.type_value == MESSAGE_TYPE_READ_REQUEST) {
@@ -62,6 +66,7 @@ PROCESS_THREAD(nullnet_example_process, ev, data)
 
       message_send(
           &message,
+          reply_destination,
           MESSAGE_TYPE_READ_RESPONSE,
           sizeof(message.data.read_rep)); 
     } else if (message.type.type_value == MESSAGE_TYPE_FORMAT_REQUEST) {
@@ -71,6 +76,7 @@ PROCESS_THREAD(nullnet_example_process, ev, data)
 
       message_send(
           &message,
+          reply_destination,
           MESSAGE_TYPE_FORMAT_RESPONSE,
           sizeof(message.data.format_rep)); 
     } else if (message.type.type_value == MESSAGE_SEND_TO_SINK_REQUEST) {
@@ -78,6 +84,7 @@ PROCESS_THREAD(nullnet_example_process, ev, data)
 
       message_send(
           &message,
+          reply_destination,
           MESSAGE_SEND_TO_SINK_REPLY,
           sizeof(message.data.send_to_sink_rep)); 
     }
