@@ -201,6 +201,16 @@ class MessageHandler:
                 source=self.source,
                 destination=self.destination,
                 data=self.data)
+        elif self.message_type == MessageType.MESSAGE_TYPE_SEND_TO_SINK_REQUEST:
+            return Messages.SendToSinkRequest(
+                source=self.source,
+                destination=self.destination,
+                data=self.data)
+        elif self.message_type == MessageType.MESSAGE_TYPE_SEND_TO_SINK_REPLY:
+            return Messages.SendToSinkReply(
+                source=self.source,
+                destination=self.destination,
+                data=self.data)
         else:
             return None
 

@@ -200,3 +200,57 @@ class FormatResponse(Message):
             source=source,
             destination=destination,
             data=message_data)
+
+
+class SendToSinkRequest(Message):
+    def __init__(
+            self,
+            source=MessageAddress.MESSAGE_ADDRESS_PC,
+            destination=MessageAddress.MESSAGE_ADDRESS_MOTE,
+            data=None,
+            length=0):
+        if data is None:
+            builder = MessageDataBuilder()
+
+            self.length = length
+            builder.add_uint32_t(length)
+
+            message_data = builder.get_data()
+        else:
+            reader = MessageDataReader(data)
+
+            self.length = reader.get_uint32_t()
+
+            message_data = data
+        super(SendToSinkRequest, self).__init__(
+            message_type=MessageType.MESSAGE_TYPE_SEND_TO_SINK_REQUEST,
+            source=source,
+            destination=destination,
+            data=message_data)
+
+
+class SendToSinkReply(Message):
+    def __init__(
+            self,
+            source=MessageAddress.MESSAGE_ADDRESS_PC,
+            destination=MessageAddress.MESSAGE_ADDRESS_MOTE,
+            data=None,
+            success=0):
+        if data is None:
+            builder = MessageDataBuilder()
+
+            self.success = success
+            builder.add_bool_t(success)
+
+            message_data = builder.get_data()
+        else:
+            reader = MessageDataReader(data)
+
+            self.success = reader.get_bool_t()
+
+            message_data = data
+        super(SendToSinkReply, self).__init__(
+            message_type=MessageType.MESSAGE_TYPE_SEND_TO_SINK_REPLY,
+            source=source,
+            destination=destination,
+            data=message_data)
