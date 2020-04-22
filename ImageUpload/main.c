@@ -81,13 +81,13 @@ PROCESS_THREAD(nullnet_example_process, ev, data)
           reply_destination,
           MESSAGE_TYPE_FORMAT_RESPONSE,
           sizeof(message.data.format_rep)); 
-    } else if (message.type.type_value == MESSAGE_SEND_TO_SINK_REQUEST) {
+    } else if (message.type.type_value == MESSAGE_TYPE_SEND_TO_SINK_REQUEST) {
       message.data.send_to_sink_rep.success = false;
 
       message_send(
           &message,
           reply_destination,
-          MESSAGE_SEND_TO_SINK_REPLY,
+          MESSAGE_TYPE_SEND_TO_SINK_REPLY,
           sizeof(message.data.send_to_sink_rep)); 
     }
   }
