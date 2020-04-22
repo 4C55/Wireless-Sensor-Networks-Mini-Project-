@@ -119,11 +119,11 @@ struct message_handler_channel {
 	bool_t (*send_byte_call)(const uint8_t value);
 	bool_t (*has_any_bytes_to_receive_call)(void);
 	uint8_t (*receive_byte_call)(void);
-	struct message received_message;
+	struct message *received_message;
 	uint8_t size_of_received_data;
 	enum message_handler_state state;
 	bool_t padding;
-    struct circullar_buffer incomming_messages;
+    bool_t has_message;
 };
 
 //---------------------------------------------------PUBLIC FUNCTIONS-------------------------------------------------//
@@ -134,13 +134,12 @@ void message_handler_init_channel(
 	bool_t (*send_single_byte)(const uint8_t byte),
 	bool_t (*has_any_bytes_to_receive)(void),
 	uint8_t (*receive_byte)(void),
-    uint8_t *data_in_buffer,
-    uint8_t data_in_buffer_size);
+	struct message *message_buffer);
 
 void message_handler_process(struct message_handler_channel *channel);
 
 void message_handler_send(struct message_handler_channel *channel, struct message *message);
 
-bool_t message_handler_receive(struct message_handler_channel *channel, struct message *message);
+bool_t message_handler_receive(struct message_handler_channel *channel);
 
 #endif /* MESSAGE_HANDLER_H_ */

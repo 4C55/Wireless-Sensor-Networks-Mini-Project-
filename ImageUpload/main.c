@@ -11,22 +11,24 @@ PROCESS_THREAD(nullnet_example_process, ev, data)
 {
   PROCESS_BEGIN();
 
+  static struct message message;
+  static uint8_t reply_destination;
+
   file_init();
-  message_init();
+  message_init(&message);
   //leds_on(LEDS_GREEN);
   PROCESS_PAUSE();
   
   PROCESS_PAUSE();
 
-  static struct message message;
-  static uint8_t reply_destination;
+  
 
   while(1) {
     PROCESS_PAUSE();
     message_process();
     PROCESS_PAUSE();
     
-    if (!message_get(&message)) {
+    if (!message_get()) {
       continue;
     }
 

@@ -13,7 +13,6 @@
 #define LOG_LEVEL LOG_CONF_LEVEL_MESSAGE
 
 #define SIZE_OF_UART_BUFFER sizeof(struct message)
-#define SIZE_OF_MESSAGE_DATA_BUFFER (sizeof(struct message))
 
 /*****************************************************************************/
 /* PRIVATE ENUMERATIONS                                                      */
@@ -33,7 +32,6 @@
 
 static struct circullar_buffer buffer;
 static uint8_t data_buffer[SIZE_OF_UART_BUFFER];
-static uint8_t data_in_buffer[SIZE_OF_MESSAGE_DATA_BUFFER];
 static struct message_handler_channel channel;
 
 /*****************************************************************************/
@@ -71,7 +69,7 @@ bool_t send_single_byte(const uint8_t byte)
 /* PUBLIC FUNCTIONS                                                          */
 /*****************************************************************************/
 
-void message_init(void)
+void message_init(struct message *message_buffer)
 {
     uart1_set_input(serial_input_byte);
     circullar_buffer_init(
@@ -86,8 +84,7 @@ void message_init(void)
 	    send_single_byte,
 	    has_any_bytes_to_receive,
 	    receive_byte,
-        data_in_buffer,
-        sizeof(data_in_buffer));
+        message_buffer);
 
     LOG_DBG("Initialised\n");
 }
@@ -97,9 +94,9 @@ void message_process(void)
     message_handler_process(&channel);
 }
 
-bool_t message_get(struct message *received)
+bool_t message_get(void)
 {
-    return message_handler_receive(&channel, received);
+    return message_handler_receive(&channel);
 }
 
 void message_send_message(struct message *message)

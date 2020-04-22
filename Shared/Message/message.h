@@ -36,11 +36,11 @@ extern "C"
 /* PUBLIC FUNCTION DECLARATION                                               */
 /*****************************************************************************/
 
-void message_init(void);
+void message_init(struct message *message_buffer);
 
 void message_process(void);
 
-bool_t message_get(struct message *received);
+bool_t message_get(void);
 
 void message_send_message(struct message *message);
 

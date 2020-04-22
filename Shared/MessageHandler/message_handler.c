@@ -19,7 +19,6 @@
 
 static void reset_message_channel(struct message_handler_channel *channel);
 static uint8_t message_get_crc(const struct message *message);
-static void message_handler_clear_message(struct message *message);
 static void massage_handler_put_byte(
 	struct message_handler_channel *channel,
 	const uint8_t byte);
@@ -36,7 +35,6 @@ static bool_t is_in_address_list(
  */
 static void reset_message_channel(struct message_handler_channel *handler)
 {
-	message_handler_clear_message(&handler->received_message);
 	handler->size_of_received_data = 0;
 	handler->state = MESSAGE_HANDLER_RECEIVING_START;
 	handler->padding = false;
@@ -124,23 +122,6 @@ static void send_with_padding(const struct message_handler_channel *handler, con
 }
 
 /**
- * @brief Clears the message.
- * @param message The message to clear.
- */
-static void message_handler_clear_message(struct message *message)
-{
-    uint8_t i;
-	message->type.type_value = MESSAGE_TYPE_EMPTY;
-	message->length = 0;
-	message->source = 0;
-	message->destination = 0;
-
-	for (i = 0; i < SIZE_OF_MESSAGE_DATA; i++) {
-		message->data.raw_data[i] = 0;
-	}
-}
-
-/**
  * @brief Puts the byte into the message handler.
  *
  * Message handler will attempt to assemble a new message from the received bytes.
@@ -166,7 +147,7 @@ static void massage_handler_put_byte(
 			return;
 		}
 
-		channel->received_message.type.type_bytes[0] = byte;
+		channel->received_message->type.type_bytes[0] = byte;
 		channel->state = MESSAGE_HANDLER_RECEIVING_TYPE_2;
 
 		break;
@@ -176,9 +157,9 @@ static void massage_handler_put_byte(
 			return;
 		}
 
-		channel->received_message.type.type_bytes[1] = byte;
+		channel->received_message->type.type_bytes[1] = byte;
 
-		if (is_valid_type(channel->received_message.type.type_value)) {
+		if (is_valid_type(channel->received_message->type.type_value)) {
 			channel->state = MESSAGE_HANDLER_RECEIVING_SOURCE;
 			return;
 		}
@@ -192,7 +173,7 @@ static void massage_handler_put_byte(
 			return;
 		}
 
-		channel->received_message.source = byte;
+		channel->received_message->source = byte;
 
         channel->state = MESSAGE_HANDLER_RECEIVING_DESTINATION;
         return;
@@ -202,9 +183,9 @@ static void massage_handler_put_byte(
 			return;
 		}
 
-		channel->received_message.destination = byte;
+		channel->received_message->destination = byte;
             
-		if (is_in_address_list(channel, channel->received_message.destination)) {
+		if (is_in_address_list(channel, channel->received_message->destination)) {
 			channel->state = MESSAGE_HANDLER_RECEIVING_LENGTH;
 			return;
 		}
@@ -219,11 +200,11 @@ static void massage_handler_put_byte(
 		}
 
 		if (byte == 0) {
-			channel->received_message.length = 0;
+			channel->received_message->length = 0;
 			channel->state = MESSAGE_HANDLER_RECEIVING_CRC;
 			return;
 		} else if (byte <= SIZE_OF_MESSAGE_DATA) {
-			channel->received_message.length = byte;
+			channel->received_message->length = byte;
 			channel->state = MESSAGE_HANDLER_RECEIVING_DATA;
 			return;
 		}
@@ -236,10 +217,10 @@ static void massage_handler_put_byte(
 			return;
 		}
 
-		channel->received_message.data.raw_data[channel->size_of_received_data] = byte;
+		channel->received_message->data.raw_data[channel->size_of_received_data] = byte;
 		channel->size_of_received_data++;
 
-		if (channel->size_of_received_data < channel->received_message.length) {
+		if (channel->size_of_received_data < channel->received_message->length) {
 			return;
 		} else {
 			channel->state = MESSAGE_HANDLER_RECEIVING_CRC;
@@ -253,7 +234,7 @@ static void massage_handler_put_byte(
 			return;
 		}
 
-		uint8_t crc = message_get_crc(&channel->received_message);
+		uint8_t crc = message_get_crc(channel->received_message);
 		if (crc == byte) {
 			channel->state = MESSAGE_HANDLER_RECEIVING_END;
 			return;
@@ -264,7 +245,7 @@ static void massage_handler_put_byte(
 	}
 	case MESSAGE_HANDLER_RECEIVING_END: {
 		if (byte == MESSAGE_END) {
-			circullar_buffer_put(&(channel->incomming_messages), &channel->received_message);
+			channel->has_message = true;
 		}
 
 		reset_message_channel(channel);
@@ -286,20 +267,15 @@ void message_handler_init_channel(
 	bool_t (*send_single_byte)(const uint8_t byte),
 	bool_t (*has_any_bytes_to_receive)(void),
 	uint8_t (*receive_byte)(void),
-    uint8_t *data_in_buffer,
-    uint8_t data_in_buffer_size)
+	struct message *message_buffer)
 {
 	handler->address = address;
 	handler->send_byte_call = send_single_byte;
 	handler->has_any_bytes_to_receive_call = has_any_bytes_to_receive;
 	handler->receive_byte_call = receive_byte;
+	handler->received_message = message_buffer;
+	handler->has_message = false;
 	reset_message_channel(handler);
-
-    circullar_buffer_init(
-		&(handler->incomming_messages),
-        data_in_buffer,
-        data_in_buffer_size,
-		sizeof(struct message));
 }
 
 void message_handler_process(struct message_handler_channel *channel)
@@ -332,7 +308,12 @@ void message_handler_send(struct message_handler_channel *channel, struct messag
 	(void)channel->send_byte_call(MESSAGE_END);
 }
 
-bool_t message_handler_receive(struct message_handler_channel *channel, struct message *message)
+bool_t message_handler_receive(struct message_handler_channel *channel)
 {
-	return circullar_buffer_get(&(channel->incomming_messages), message);
+	if (channel->has_message) {
+		channel->has_message = false;
+		return true;
+	}
+
+	return false;
 }
