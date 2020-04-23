@@ -2,23 +2,23 @@
 #include "types.h"
 #include "contiki.h"
 #include "message.h"
-#include "leds.h"
-#include "Connection/connection.h"
 
 #define SIZE_OF_IMAGE_BUFFER (1 * 1024)
 
 /*Message variables*/
 static struct message message;
 static uint8_t reply_destination;
-static uint8_t image_buffer[SIZE_OF_IMAGE_BUFFER];
 
 /*File upload variables*/
+/*
+static uint8_t image_buffer[SIZE_OF_IMAGE_BUFFER];
 static uint32_t total_to_send;
 static uint32_t total_sent = 0;
 static uint32_t total_count = 0;
 static uint32_t to_send;
 static uint32_t sent = 0;
 static uint32_t count = 0;
+*/
 
 PROCESS(producer_process, "ImageUpload");
 AUTOSTART_PROCESSES(&producer_process);
@@ -28,13 +28,10 @@ PROCESS_THREAD(producer_process, ev, data)
   PROCESS_BEGIN();
 
   file_init();
+  PROCESS_PAUSE();
   message_init(&message);
-  connection_init();
   PROCESS_PAUSE();
   
-  PROCESS_PAUSE();
-
-
   while(1) {
     PROCESS_PAUSE();
     message_process();
@@ -94,6 +91,7 @@ PROCESS_THREAD(producer_process, ev, data)
           MESSAGE_TYPE_FORMAT_RESPONSE,
           sizeof(message.data.format_rep)); 
     } else if (message.type.type_value == MESSAGE_TYPE_SEND_TO_SINK_REQUEST) {
+      /*
       total_to_send = message.data.send_to_sink_req.length;
       total_sent = 0;
       total_count = 0;
@@ -123,21 +121,15 @@ PROCESS_THREAD(producer_process, ev, data)
             count = to_send - sent;
           } 
 
-          connection_start_sending(image_buffer + sent, count);
-          PROCESS_PAUSE();
-          while (connection_get_state() == CONNECTION_STATE_SENDING) {
-            PROCESS_PAUSE();
-          }
+          //Missing actual sending
 
-          if (connection_get_state() == CONNECTION_STATE_SENT) {
-            sent = sent + count;
-          }
+          sent = sent + count;
         }
 
         total_sent = total_sent + total_count;
       }
-
-      message.data.send_to_sink_rep.success = true;
+      */
+      message.data.send_to_sink_rep.success = false;
       message_send(
           &message,
           reply_destination,
@@ -148,41 +140,3 @@ PROCESS_THREAD(producer_process, ev, data)
 
   PROCESS_END();
 }
-
-/*
-PROCESS_THREAD(nullnet_example_process, ev, data)
-{
-  static uint8_t buffer[2000];
-  static uint32_t i = 0;
-  static uint32_t j = 0;
-  PROCESS_BEGIN();
-
-  file_init();
-  connection_init();
-  PROCESS_PAUSE();
-
-  for (i = 0; i < 66000; i = i + 2000) {
-    file_read(i, buffer, 2000);
-    PROCESS_PAUSE();
-
-    for (j = 0; j < 2000; j = j + 100) {
-      connection_start_sending(buffer + j, 100);
-
-      while (connection_get_state() == CONNECTION_STATE_SENDING) {
-        PROCESS_PAUSE();
-      }
-
-      if (connection_get_state() == CONNECTION_STATE_FAILED) {
-        //Repeat
-        j = j - 100;
-      }
-    }
-  }
-
-  while(1) {
-      PROCESS_PAUSE();
-  }
-
-  PROCESS_END();
-}
-*/

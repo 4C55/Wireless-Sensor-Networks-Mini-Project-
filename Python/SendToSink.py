@@ -11,10 +11,9 @@ def main(argv):
     # Setup what's needed
     handler = MessageHandler(port)
 
-    message = Messages.SendToSinkRequest(
-        length=256*256)
+    message = Messages.SendToSinkRequest(length=200)
     reply = handler.send_and_wait(message, MessageType.MESSAGE_TYPE_SEND_TO_SINK_REPLY)
-    pass
+    print(reply)
 
 if __name__ == '__main__':
     main(sys.argv[1:])
