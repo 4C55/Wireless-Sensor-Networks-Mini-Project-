@@ -11,7 +11,7 @@ def main(argv):
     port = argv[1]
 
     # Setup what's needed
-    handler = MessageHandler(port, show_input=True)
+    handler = MessageHandler(port, show_input=False)
     file = open(file)
     image = file.read()
     file.close()

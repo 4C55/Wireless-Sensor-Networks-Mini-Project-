@@ -239,9 +239,7 @@ class MessageHandler:
             expected_destination=MessageAddress.MESSAGE_ADDRESS_PC,
             timeout_s=3):
         message_bytes = get_message_bytes(message)
-
         transmition_bytes = get_transmition_byte(message_bytes)
-        print(transmition_bytes)
         self.port.write(transmition_bytes)
         self.reset_message_parsing_state()
         self.port.flush()

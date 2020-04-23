@@ -1,7 +1,7 @@
 #include "file.h"
 #include "types.h"
 #include "contiki.h"
-#include "message.h"
+#include "pc_link.h"
 
 #define SIZE_OF_IMAGE_BUFFER (1 * 1024)
 
@@ -29,22 +29,22 @@ PROCESS_THREAD(producer_process, ev, data)
 
   file_init();
   PROCESS_PAUSE();
-  message_init(&message);
+  pc_link_init(&message);
   PROCESS_PAUSE();
   
   while(1) {
     PROCESS_PAUSE();
-    message_process();
+    pc_link_process();
     PROCESS_PAUSE();
     
-    if (!message_get()) {
+    if (!pc_link_get()) {
       continue;
     }
 
     reply_destination = message.source;
 
     if (message.type.type_value == MESSAGE_TYPE_TEST_REQUEST) {
-      message_send(
+      pc_link_send(
           &message,
           reply_destination,
           MESSAGE_TYPE_TEST_RESPONSE,
@@ -57,7 +57,7 @@ PROCESS_THREAD(producer_process, ev, data)
 
       PROCESS_PAUSE();
 
-      message_send(
+      pc_link_send(
           &message,
           reply_destination,
           MESSAGE_TYPE_WRITE_RESPONE,
@@ -75,7 +75,7 @@ PROCESS_THREAD(producer_process, ev, data)
 
       PROCESS_PAUSE();
 
-      message_send(
+      pc_link_send(
           &message,
           reply_destination,
           MESSAGE_TYPE_READ_RESPONSE,
@@ -85,7 +85,7 @@ PROCESS_THREAD(producer_process, ev, data)
 
       PROCESS_PAUSE();
 
-      message_send(
+      pc_link_send(
           &message,
           reply_destination,
           MESSAGE_TYPE_FORMAT_RESPONSE,
@@ -130,7 +130,7 @@ PROCESS_THREAD(producer_process, ev, data)
       }
       */
       message.data.send_to_sink_rep.success = false;
-      message_send(
+      pc_link_send(
           &message,
           reply_destination,
           MESSAGE_TYPE_SEND_TO_SINK_REPLY,
