@@ -14,6 +14,4 @@ PROJECT_SOURCEFILES += circullar_buffer.c
 PROJECT_SOURCEFILES += message_handler.c
 CONTIKI = ../..
 
-MAKE_MAC ?= MAKE_MAC_CSMA
-MAKE_NET = MAKE_NET_NULLNET
 include $(CONTIKI)/Makefile.include
