@@ -1,40 +1,51 @@
 #include "contiki.h"
+#include "net/routing/routing.h"
 #include "net/netstack.h"
-#include "net/nullnet/nullnet.h"
-#include "dev/leds.h"
-#include <string.h>
-#include <stdio.h>
+#include "net/ipv6/simple-udp.h"
+#include "sys/log.h"
 
-/*---------------------------------------------------------------------------*/
-PROCESS(nullnet_example_process, "Consumer");
-AUTOSTART_PROCESSES(&nullnet_example_process);
+#define UDP_LOCAL_PORT	5678
+#define UDP_REMOTE_PORT	8765
 
-/*---------------------------------------------------------------------------*/
-void input_callback(
-  const void *data,
-  uint16_t len,
-  const linkaddr_t *src,
-  const linkaddr_t *dest)
+static struct simple_udp_connection udp_conn;
+
+PROCESS(sink_process, "UDP server");
+AUTOSTART_PROCESSES(&sink_process);
+
+static void udp_rx_callback(struct simple_udp_connection *c,
+         const uip_ipaddr_t *sender_addr,
+         uint16_t sender_port,
+         const uip_ipaddr_t *receiver_addr,
+         uint16_t receiver_port,
+         const uint8_t *data,
+         uint16_t datalen)
 {
-  int i = 0;
-  for (i = 0; i < len; i++) {
-    putchar(((uint8_t *)data)[i]);
+  uint16_t i;
+
+  for (i = 0; i < datalen; i++) {
+    putchar(data[i]);
   }
 }
-/*---------------------------------------------------------------------------*/
-PROCESS_THREAD(nullnet_example_process, ev, data)
-{
-  static struct etimer periodic_timer;
 
+PROCESS_THREAD(sink_process, ev, data)
+{
   PROCESS_BEGIN();
 
-  nullnet_set_input_callback(input_callback);
+  /* Initialize DAG root */
+  NETSTACK_ROUTING.root_start();
 
-  etimer_set(&periodic_timer, 1 * CLOCK_SECOND);
-  while(1) {
-    leds_toggle(LEDS_GREEN);
-    PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&periodic_timer));
-    etimer_reset(&periodic_timer);
+  /* Initialize UDP connection */
+  simple_udp_register(
+    &udp_conn,
+    UDP_LOCAL_PORT,
+    NULL,
+    UDP_REMOTE_PORT,
+    udp_rx_callback);
+
+  printf("Sink running\n");
+
+  while (1) {
+    PROCESS_PAUSE();
   }
 
   PROCESS_END();

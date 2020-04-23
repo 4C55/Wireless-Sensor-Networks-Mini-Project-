@@ -268,7 +268,7 @@ class MessageHandler:
             if len(received_byte) == 1:
                 received_byte = int.from_bytes(received_byte, byteorder='little')
                 if self.show_input:
-                    print('%c' % (received_byte, ), end='')
+                    print('%c' % (received_byte, ), end='', flush=True)
                 return received_byte
 
 
