@@ -1,4 +1,4 @@
-CONTIKI_PROJECT = nullnet-client-lab
+CONTIKI_PROJECT = ConsumerSink
 all: $(CONTIKI_PROJECT)
 
 CONTIKI = ../..

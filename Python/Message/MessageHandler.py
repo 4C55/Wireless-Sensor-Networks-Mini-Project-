@@ -39,7 +39,8 @@ def get_transmition_byte(message_bytes):
 class MessageHandler:
     def __init__(
             self,
-            port):
+            port,
+            show_input=False):
         self.port = serial.Serial()
         self.port.baudrate = 57600
         self.port.port = port
@@ -53,6 +54,7 @@ class MessageHandler:
         self.destination = 0
         self.length = 0
         self.data = []
+        self.show_input = show_input
 
     def is_padding(self, byte):
         if self.padding:
@@ -87,10 +89,6 @@ class MessageHandler:
         return crc
 
     def parse_byte(self, byte):
-        byte = int.from_bytes(byte, byteorder='little')
-
-        print('%c' % byte, end='')
-
         # MESSAGE_HANDLER_RECEIVING_START
         if self.parsing_state == MessageHandlerState.MESSAGE_HANDLER_RECEIVING_START:
             if byte == MESSAGE_START:
@@ -251,12 +249,10 @@ class MessageHandler:
         start = datetime.now()
         response = None
         while (datetime.now() - start).total_seconds() < timeout_s:
-            received_byte = self.port.read(size=1)
-            if len(received_byte) == 1:
-                response = self.parse_byte(received_byte)
-                if response is not None:
-                    break
-
+            received_byte = self.receive_byte()
+            response = self.parse_byte(received_byte)
+            if response is not None:
+                break
         if (
                 response is not None and
                 response.message_type == expected_response and
@@ -265,6 +261,15 @@ class MessageHandler:
             return response
         else:
             return None
+
+    def receive_byte(self):
+        while True:
+            received_byte = self.port.read(size=1)
+            if len(received_byte) == 1:
+                received_byte = int.from_bytes(received_byte, byteorder='little')
+                if self.show_input:
+                    print('%c' % (received_byte, ), end='')
+                return received_byte
 
 
     def dispose(self):
