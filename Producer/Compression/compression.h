@@ -1,5 +1,5 @@
-#ifndef TYPES_H_
-#define TYPES_H_
+#ifndef COMPRESSION_H_
+#define COMPRESSION_H_
 
 #ifdef	__cplusplus
 extern "C"
@@ -10,15 +10,11 @@ extern "C"
 /* INCLUDES                                                                  */
 /*****************************************************************************/
 
-#include <stdio.h>
+#include "types.h"
 
 /*****************************************************************************/
 /* PUBLIC DEFINES                                                            */
 /*****************************************************************************/
-
-#define bool_t uint8_t
-#define true 1
-#define false 0
 
 /*****************************************************************************/
 /* PUBLIC ENUMERATIONS                                                       */
@@ -36,8 +32,6 @@ extern "C"
 /* PUBLIC FUNCTION DECLARATION                                               */
 /*****************************************************************************/
 
-#ifdef	__cplusplus
-}
-#endif
+uint32_t compression_run(uint8_t *buffer, const uint32_t length);
 
-#endif /* TYPES_H_ */
+#endif /* COMPRESSION_H_ */
