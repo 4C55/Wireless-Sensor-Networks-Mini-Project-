@@ -1,24 +1,25 @@
 #include "file.h"
 #include "types.h"
 #include "contiki.h"
+#include "leds.h"
+#include "connection.h"
 #include "pc_link.h"
+
 
 #define SIZE_OF_IMAGE_BUFFER (1 * 1024)
 
 /*Message variables*/
 static struct message message;
 static uint8_t reply_destination;
+static uint8_t image_buffer[SIZE_OF_IMAGE_BUFFER];
 
 /*File upload variables*/
-/*
-static uint8_t image_buffer[SIZE_OF_IMAGE_BUFFER];
 static uint32_t total_to_send;
 static uint32_t total_sent = 0;
 static uint32_t total_count = 0;
 static uint32_t to_send;
 static uint32_t sent = 0;
 static uint32_t count = 0;
-*/
 
 PROCESS(producer_process, "ImageUpload");
 AUTOSTART_PROCESSES(&producer_process);
@@ -28,10 +29,14 @@ PROCESS_THREAD(producer_process, ev, data)
   PROCESS_BEGIN();
 
   file_init();
-  PROCESS_PAUSE();
+  connection_init();
   pc_link_init(&message);
+  connection_init();
   PROCESS_PAUSE();
   
+  PROCESS_PAUSE();
+
+
   while(1) {
     PROCESS_PAUSE();
     pc_link_process();
@@ -91,23 +96,16 @@ PROCESS_THREAD(producer_process, ev, data)
           MESSAGE_TYPE_FORMAT_RESPONSE,
           sizeof(message.data.format_rep)); 
     } else if (message.type.type_value == MESSAGE_TYPE_SEND_TO_SINK_REQUEST) {
-      /*
       total_to_send = message.data.send_to_sink_req.length;
       total_sent = 0;
       total_count = 0;
       
-      while (total_sent < total_to_send) {
-        printf("total_sent: %ld; total_to_send: %ld\n", total_sent, total_to_send);
-        
+      while (total_sent < total_to_send) {       
         if (total_to_send - total_sent >= SIZE_OF_IMAGE_BUFFER) {
-          printf("WHY\n");
           total_count = SIZE_OF_IMAGE_BUFFER;
         } else {
-          printf("AND WHY\n");
           total_count = total_to_send - total_sent;
         }
-
-        printf("%ld\n", total_count);
 
         (void)file_read(total_sent, image_buffer, total_count);
         to_send = total_count;
@@ -121,15 +119,21 @@ PROCESS_THREAD(producer_process, ev, data)
             count = to_send - sent;
           } 
 
-          //Missing actual sending
+          connection_start_sending(image_buffer + sent, count);
+          PROCESS_PAUSE();
+          while (connection_get_state() == CONNECTION_STATE_SENDING) {
+            PROCESS_PAUSE();
+          }
 
-          sent = sent + count;
+          if (connection_get_state() == CONNECTION_STATE_SENT) {
+            sent = sent + count;
+          }
         }
 
         total_sent = total_sent + total_count;
       }
-      */
-      message.data.send_to_sink_rep.success = false;
+
+      message.data.send_to_sink_rep.success = true;
       pc_link_send(
           &message,
           reply_destination,

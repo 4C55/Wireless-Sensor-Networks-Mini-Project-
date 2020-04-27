@@ -9,7 +9,7 @@ def main(argv):
     port = argv[0]
 
     # Setup what's needed
-    handler = MessageHandler(port)
+    handler = MessageHandler(port, show_input=True)
 
     message = Messages.SendToSinkRequest(length=200)
     reply = handler.send_and_wait(message, MessageType.MESSAGE_TYPE_SEND_TO_SINK_REPLY)
