@@ -208,18 +208,23 @@ class SendToSinkRequest(Message):
             source=MessageAddress.MESSAGE_ADDRESS_PC,
             destination=MessageAddress.MESSAGE_ADDRESS_MOTE,
             data=None,
-            length=0):
+            length=0,
+            compression_type=0):
         if data is None:
             builder = MessageDataBuilder()
 
             self.length = length
-            builder.add_uint32_t(length)
+            builder.add_uint32_t(self.length)
+
+            self.compression_type = compression_type
+            builder.add_uint8_t(self.compression_type)
 
             message_data = builder.get_data()
         else:
             reader = MessageDataReader(data)
 
             self.length = reader.get_uint32_t()
+            self.compression_type = reader.get_uint8_t()
 
             message_data = data
         super(SendToSinkRequest, self).__init__(
@@ -237,18 +242,18 @@ class SendToSinkReply(Message):
             source=MessageAddress.MESSAGE_ADDRESS_PC,
             destination=MessageAddress.MESSAGE_ADDRESS_MOTE,
             data=None,
-            success=0):
+            sent_length=0):
         if data is None:
             builder = MessageDataBuilder()
 
-            self.success = success
-            builder.add_bool_t(success)
+            self.sent_length = sent_length
+            builder.add_uint32_t(sent_length)
 
             message_data = builder.get_data()
         else:
             reader = MessageDataReader(data)
 
-            self.success = reader.get_bool_t()
+            self.sent_length = reader.get_uint32_t()
 
             message_data = data
         super(SendToSinkReply, self).__init__(

@@ -8,6 +8,7 @@
 #include "leds.h"
 #include "sink_link.h"
 #include "pc_link.h"
+#include "compression.h"
 
 
 /*****************************************************************************/
@@ -53,6 +54,22 @@ static uint32_t get_next_buffer_lenght(void)
   } else {
     return total_to_send - total_sent;
   }
+}
+
+static void start_sending_start_code(enum compression_type compression)
+{
+  image_buffer[0] = 0xff;
+  image_buffer[1] = 0xff;
+  image_buffer[2] = compression;
+  sink_link_start_sending(image_buffer, 3);
+}
+
+static void start_sending_end_code()
+{
+  image_buffer[0] = 0xff;
+  image_buffer[1] = 0xff;
+  image_buffer[2] = 0xff;
+  sink_link_start_sending(image_buffer, 3);
 }
 
 /*****************************************************************************/
@@ -136,14 +153,20 @@ PROCESS_THREAD(producer_process, ev, data)
       total_to_send = message.data.send_to_sink_req.length;
       total_sent = 0;
       total_count = 0;
+
+      /*Send start code*/
+      start_sending_start_code(message.data.send_to_sink_req.compression_type);
+      while (sink_link_continue_sending() == CONNECTION_STATE_SENDING) {
+        PROCESS_PAUSE();
+      }
       
       while (total_sent < total_to_send) {       
         total_count = get_next_buffer_lenght();
 
         (void)file_read(total_sent, image_buffer, total_count);
         PROCESS_PAUSE();
-        /*Compress*/
-        
+
+        /*Send image*/
         sink_link_start_sending(image_buffer, total_count);
         while (sink_link_continue_sending() == CONNECTION_STATE_SENDING) {
           PROCESS_PAUSE();
@@ -152,7 +175,13 @@ PROCESS_THREAD(producer_process, ev, data)
         total_sent = total_sent + total_count;        
       }
 
-      message.data.send_to_sink_rep.success = true;
+      /*Send end code*/
+      start_sending_end_code();
+      while (sink_link_continue_sending() == CONNECTION_STATE_SENDING) {
+        PROCESS_PAUSE();
+      }
+
+      message.data.send_to_sink_rep.sent_length = total_sent;
       pc_link_send(
           &message,
           reply_destination,

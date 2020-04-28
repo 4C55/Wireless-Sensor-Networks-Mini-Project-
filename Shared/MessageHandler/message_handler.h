@@ -82,11 +82,12 @@ struct format_reply
 struct send_to_sink_request
 {
 	uint32_t length;
+	uint8_t compression_type;
 };
 
 struct send_to_sink_reply
 {
-	bool_t success;
+	uint32_t sent_length;
 };
 
 union message_data {

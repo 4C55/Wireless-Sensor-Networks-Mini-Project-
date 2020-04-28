@@ -23,7 +23,7 @@ def main(argv):
     print("Found %d bytes to upload" % total_bytes)
 
     # Format memory
-    print('Formatting memory...', end=' ')
+    print('Formatting memory...', end=' ', flush=True)
     message = Messages.FormatRequest()
     reply = handler.send_and_wait(message, MessageType.MESSAGE_TYPE_FORMAT_RESPONSE)
     if reply is None or not reply.success:
@@ -33,7 +33,7 @@ def main(argv):
         print('Success!')
 
     # Upload image
-    print('Writing image file...', end=' ')
+    print('Writing image file...', end=' ', flush=True)
     bytes_sent = 0
     printed = []
     while bytes_sent < total_bytes:
@@ -51,7 +51,7 @@ def main(argv):
         bytes_sent = bytes_sent + len(data)
         completed = int((bytes_sent / total_bytes) * 100)
         if completed % 10 == 0 and completed not in printed:
-            print('%d%%' % (completed,), end=' ')
+            print('%d%%' % (completed,), end=' ', flush=True)
             printed.append(completed)
     print("Success!")
 
@@ -82,7 +82,7 @@ def main(argv):
 
         completed = int((bytes_read / total_bytes) * 100)
         if completed % 10 == 0 and completed not in printed:
-            print('%d%%' % (completed, ), end=' ')
+            print('%d%%' % (completed, ), end=' ', flush=True)
             printed.append(completed)
 
     print('Success!')
