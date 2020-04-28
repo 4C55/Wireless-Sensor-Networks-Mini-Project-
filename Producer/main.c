@@ -29,9 +29,8 @@ PROCESS_THREAD(producer_process, ev, data)
   PROCESS_BEGIN();
 
   file_init();
-  connection_init();
+  sink_link_init();
   pc_link_init(&message);
-  connection_init();
   PROCESS_PAUSE();
   
   PROCESS_PAUSE();
@@ -119,13 +118,13 @@ PROCESS_THREAD(producer_process, ev, data)
             count = to_send - sent;
           } 
 
-          connection_start_sending(image_buffer + sent, count);
+          sink_link_start_sending(image_buffer + sent, count);
           PROCESS_PAUSE();
-          while (connection_get_state() == CONNECTION_STATE_SENDING) {
+          while (sink_link_get_state() == CONNECTION_STATE_SENDING) {
             PROCESS_PAUSE();
           }
 
-          if (connection_get_state() == CONNECTION_STATE_SENT) {
+          if (sink_link_get_state() == CONNECTION_STATE_SENT) {
             sent = sent + count;
           }
         }
