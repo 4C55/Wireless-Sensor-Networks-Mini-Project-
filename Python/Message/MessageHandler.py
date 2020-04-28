@@ -42,7 +42,7 @@ class MessageHandler:
             port,
             show_input=False):
         self.port = serial.Serial()
-        self.port.baudrate = 57600
+        self.port.baudrate = 115200
         self.port.port = port
         self.port.timeout = 0.01
         self.port.open()

@@ -20,7 +20,7 @@ extern "C"
 /* PUBLIC DEFINES                                                            */
 /*****************************************************************************/
 
-#define SIZE_OF_SINGLE_TRANSMITION 100
+#define SIZE_OF_SINGLE_TRANSMITION 400
 
 /*****************************************************************************/
 /* PUBLIC ENUMERATIONS                                                       */
