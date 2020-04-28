@@ -1,3 +1,7 @@
+/*****************************************************************************/
+/* INCLUDES                                                                  */
+/*****************************************************************************/
+
 #include "file.h"
 #include "types.h"
 #include "contiki.h"
@@ -6,7 +10,27 @@
 #include "pc_link.h"
 
 
+/*****************************************************************************/
+/* DEFINES                                                                   */
+/*****************************************************************************/
+
 #define SIZE_OF_IMAGE_BUFFER (1 * 1024)
+
+/*****************************************************************************/
+/* PRIVATE ENUMERATIONS                                                      */
+/*****************************************************************************/
+
+/*****************************************************************************/
+/* PRIVATE STRUCTS                                                           */
+/*****************************************************************************/
+
+/*****************************************************************************/
+/* PRIVATE FUNCTION DECLARATION                                              */
+/*****************************************************************************/
+
+/*****************************************************************************/
+/* PRIVATE VARIABLES                                                         */
+/*****************************************************************************/
 
 /*Message variables*/
 static struct message message;
@@ -17,9 +41,23 @@ static uint8_t image_buffer[SIZE_OF_IMAGE_BUFFER];
 static uint32_t total_to_send;
 static uint32_t total_sent = 0;
 static uint32_t total_count = 0;
-static uint32_t to_send;
-static uint32_t sent = 0;
-static uint32_t count = 0;
+
+/*****************************************************************************/
+/* PRIVATE FUNCTIONS                                                         */
+/*****************************************************************************/
+
+static uint32_t get_next_buffer_lenght(void)
+{
+  if (total_to_send - total_sent >= SIZE_OF_IMAGE_BUFFER) {
+    return SIZE_OF_IMAGE_BUFFER;
+  } else {
+    return total_to_send - total_sent;
+  }
+}
+
+/*****************************************************************************/
+/* PROCESS FUNCTIONS                                                         */
+/*****************************************************************************/
 
 PROCESS(producer_process, "ImageUpload");
 AUTOSTART_PROCESSES(&producer_process);
@@ -100,36 +138,18 @@ PROCESS_THREAD(producer_process, ev, data)
       total_count = 0;
       
       while (total_sent < total_to_send) {       
-        if (total_to_send - total_sent >= SIZE_OF_IMAGE_BUFFER) {
-          total_count = SIZE_OF_IMAGE_BUFFER;
-        } else {
-          total_count = total_to_send - total_sent;
-        }
+        total_count = get_next_buffer_lenght();
 
         (void)file_read(total_sent, image_buffer, total_count);
-        to_send = total_count;
-        sent = 0;
-        count = 0;
-
-        while (sent < to_send) {
-          if (to_send - sent > SIZE_OF_SINGLE_TRANSMITION) {
-            count = SIZE_OF_SINGLE_TRANSMITION;
-          } else {
-            count = to_send - sent;
-          } 
-
-          sink_link_start_sending(image_buffer + sent, count);
+        PROCESS_PAUSE();
+        /*Compress*/
+        
+        sink_link_start_sending(image_buffer, total_count);
+        while (sink_link_continue_sending() == CONNECTION_STATE_SENDING) {
           PROCESS_PAUSE();
-          while (sink_link_get_state() == CONNECTION_STATE_SENDING) {
-            PROCESS_PAUSE();
-          }
-
-          if (sink_link_get_state() == CONNECTION_STATE_SENT) {
-            sent = sent + count;
-          }
         }
 
-        total_sent = total_sent + total_count;
+        total_sent = total_sent + total_count;        
       }
 
       message.data.send_to_sink_rep.success = true;
