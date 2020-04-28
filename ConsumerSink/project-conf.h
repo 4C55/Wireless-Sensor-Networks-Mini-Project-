@@ -1,1 +1,0 @@
-#define PACKETBUF_CONF_SIZE 1024

@@ -21,6 +21,7 @@ void input_callback(
     putchar(((uint8_t *)data)[i]);
   }
 }
+
 /*---------------------------------------------------------------------------*/
 PROCESS_THREAD(nullnet_example_process, ev, data)
 {

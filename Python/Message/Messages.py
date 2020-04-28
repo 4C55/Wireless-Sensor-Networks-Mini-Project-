@@ -226,7 +226,9 @@ class SendToSinkRequest(Message):
             message_type=MessageType.MESSAGE_TYPE_SEND_TO_SINK_REQUEST,
             source=source,
             destination=destination,
-            data=message_data)
+            data=message_data,
+            attempts=2,
+            timeout=60)
 
 
 class SendToSinkReply(Message):

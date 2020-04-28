@@ -11,7 +11,7 @@ def main(argv):
     # Setup what's needed
     handler = MessageHandler(port, show_input=True)
 
-    message = Messages.SendToSinkRequest(length=120)
+    message = Messages.SendToSinkRequest(length=256*256)
     reply = handler.send_and_wait(message, MessageType.MESSAGE_TYPE_SEND_TO_SINK_REPLY)
     print(reply)
 
