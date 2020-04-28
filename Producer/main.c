@@ -2,7 +2,7 @@
 #include "types.h"
 #include "contiki.h"
 #include "leds.h"
-#include "connection.h"
+#include "sink_link.h"
 #include "pc_link.h"
 
 
