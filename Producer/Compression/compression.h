@@ -39,6 +39,6 @@ enum compression_type
 /* PUBLIC FUNCTION DECLARATION                                               */
 /*****************************************************************************/
 
-uint32_t compression_run(uint8_t *buffer, const uint32_t length);
+uint32_t compression_runlength(uint8_t *buffer, const uint32_t length);
 
 #endif /* COMPRESSION_H_ */
