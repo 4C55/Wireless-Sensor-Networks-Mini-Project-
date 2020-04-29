@@ -33,7 +33,7 @@
 /* PUBLIC FUNCTIONS                                                          */
 /*****************************************************************************/
 
-uint32_t compression_runlength(uint8_t *buffer, const uint32_t length)
+uint32_t compression_runlength(uint8_t *buffer, const uint32_t count)
 {
     uint8_t i;
     uint32_t parse_index;
@@ -41,8 +41,8 @@ uint32_t compression_runlength(uint8_t *buffer, const uint32_t length)
     uint8_t length = 1;
     uint8_t last_value = buffer[0];
 
-    for (parse_index = 1; parse_index < length; parse_index++) {
-        if (last_value == buffer[parse_index] && length < 254) {
+    for (parse_index = 1; parse_index <= count; parse_index++) {
+        if (last_value == buffer[parse_index] && length < 254 && parse_index < count) {
             length = length + 1;
             continue;
         }
@@ -52,9 +52,10 @@ uint32_t compression_runlength(uint8_t *buffer, const uint32_t length)
             write_index = write_index + 1;
             buffer[write_index] = last_value;
             write_index = write_index + 1;
-            buffer[write_index] = 0xff;
+            buffer[write_index] = length;
             write_index = write_index + 1;
-        } else {
+        }
+        else {
             for (i = 0; i < length; i++) {
                 buffer[write_index] = last_value;
                 write_index = write_index + 1;
@@ -64,4 +65,6 @@ uint32_t compression_runlength(uint8_t *buffer, const uint32_t length)
         length = 1;
         last_value = buffer[parse_index];
     }
+
+    return write_index;
 }

@@ -72,6 +72,24 @@ static void start_sending_end_code()
   sink_link_start_sending(image_buffer, 3);
 }
 
+static uint32_t apply_compression(
+  uint8_t buffer[],
+  const uint32_t original_length,
+  enum compression_type type)
+{
+  switch (type)
+  {
+    case COMPRESSION_TYPE_RUN_LENGTH:
+    {
+      return compression_runlength(buffer, original_length);
+    }
+    default:
+    {
+      return original_length;
+    }
+  }
+}
+
 /*****************************************************************************/
 /* PROCESS FUNCTIONS                                                         */
 /*****************************************************************************/
@@ -158,16 +176,26 @@ PROCESS_THREAD(producer_process, ev, data)
       start_sending_start_code(message.data.send_to_sink_req.compression_type);
       while (sink_link_continue_sending() == CONNECTION_STATE_SENDING) {
         PROCESS_PAUSE();
-      }
-      
+      }     
+
       while (total_sent < total_to_send) {       
         total_count = get_next_buffer_lenght();
 
+        /*Read chunk of the image*/
+        /*TBD - watchout for read failures*/
         (void)file_read(total_sent, image_buffer, total_count);
         PROCESS_PAUSE();
 
-        /*Send image*/
-        sink_link_start_sending(image_buffer, total_count);
+        /*Compress the chunk*/
+        uint32_t compressed_length = apply_compression(
+          image_buffer,
+          total_count,
+          message.data.send_to_sink_req.compression_type
+        );
+
+        /*Send compressed chunk*/
+        /*TBD - watch out for transmission failures*/
+        sink_link_start_sending(image_buffer, compressed_length);
         while (sink_link_continue_sending() == CONNECTION_STATE_SENDING) {
           PROCESS_PAUSE();
         }
