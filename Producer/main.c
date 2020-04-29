@@ -15,7 +15,7 @@
 /* DEFINES                                                                   */
 /*****************************************************************************/
 
-#define SIZE_OF_IMAGE_BUFFER (1 * 1024)
+#define SIZE_OF_IMAGE_BUFFER (4 * 1024)
 
 /*****************************************************************************/
 /* PRIVATE ENUMERATIONS                                                      */
@@ -104,7 +104,8 @@ PROCESS_THREAD(producer_process, ev, data)
   file_init();
   sink_link_init();
   pc_link_init(&message);
-  PROCESS_PAUSE();
+  P2DIR |= ((1 << 3) | (1 << 6));
+  P2OUT &= ~((1 << 3) | (1 << 6));
   
   PROCESS_PAUSE();
 
@@ -168,6 +169,7 @@ PROCESS_THREAD(producer_process, ev, data)
           MESSAGE_TYPE_FORMAT_RESPONSE,
           sizeof(message.data.format_rep)); 
     } else if (message.type.type_value == MESSAGE_TYPE_SEND_TO_SINK_REQUEST) {
+      P2OUT |= (1 << 3);
       total_to_send = message.data.send_to_sink_req.length;
       total_sent = 0;
       total_count = 0;
@@ -187,11 +189,13 @@ PROCESS_THREAD(producer_process, ev, data)
         PROCESS_PAUSE();
 
         /*Compress the chunk*/
+        P2OUT |= (1 << 6);
         uint32_t compressed_length = apply_compression(
           image_buffer,
           total_count,
           message.data.send_to_sink_req.compression_type
         );
+        P2OUT &= ~(1 << 6);
 
         /*Send compressed chunk*/
         /*TBD - watch out for transmission failures*/
@@ -215,6 +219,7 @@ PROCESS_THREAD(producer_process, ev, data)
           reply_destination,
           MESSAGE_TYPE_SEND_TO_SINK_REPLY,
           sizeof(message.data.send_to_sink_rep)); 
+      P2OUT &= ~(1 << 3);
     }
   }
 
