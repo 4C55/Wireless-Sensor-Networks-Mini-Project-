@@ -1,5 +1,5 @@
-#ifndef COMPRESSION_H_
-#define COMPRESSION_H_
+#ifndef pc_link_H_
+#define pc_link_H_
 
 #ifdef	__cplusplus
 extern "C"
@@ -11,17 +11,14 @@ extern "C"
 /*****************************************************************************/
 
 #include "types.h"
+#include "sys/log.h"
+#include "dev/uart1.h"
+#include "circullar_buffer.h"
+#include "message_handler.h"
 
 /*****************************************************************************/
 /* PUBLIC DEFINES                                                            */
 /*****************************************************************************/
-
-enum compression_type
-{
-    COMPRESSION_TYPE_NONE,
-    COMPRESSION_TYPE_SCALE,
-    COMPRESSION_TYPE_RUN_LENGTH
-};
 
 /*****************************************************************************/
 /* PUBLIC ENUMERATIONS                                                       */
@@ -39,6 +36,20 @@ enum compression_type
 /* PUBLIC FUNCTION DECLARATION                                               */
 /*****************************************************************************/
 
-uint32_t compression_runlength(uint8_t *buffer, const uint32_t length);
+void pc_link_init(struct message *message_buffer);
 
-#endif /* COMPRESSION_H_ */
+void pc_link_process(void);
+
+bool_t pc_link_get(void);
+
+void pc_link_send(
+    struct message *message,
+    const uint8_t destination,
+    const uint16_t type,
+    const uint8_t length);
+
+#ifdef	__cplusplus
+}
+#endif
+
+#endif /* pc_link_H_ */
