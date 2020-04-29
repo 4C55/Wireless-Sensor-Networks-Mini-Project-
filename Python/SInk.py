@@ -5,6 +5,7 @@ from PIL import Image
 import numpy as np
 from Message.MessageHandler import MessageHandler
 from Message import CompressionType
+from Compression import RunlLength
 
 STATE_IDLE = 0
 STATE_RECEIVING_IMAGE = 1
@@ -63,13 +64,13 @@ def handle_image(parent_path, received_data, compression_type):
 
     path = os.path.join(parent_path, type)
     Path(path).mkdir(parents=True, exist_ok=True)
-    received_bytes = os.path.join(path, 'received.txt')
+    received_bytes_file = os.path.join(path, 'received.txt')
     reconstructed_bytes = os.path.join(path, 'reconstructed.txt')
     info = os.path.join(path, 'info.csv')
     image_file = os.path.join(path, 'reconstructed.png')
 
     save_info(info, len(received_data), len(reconstructed_data))
-    save_received_bytes(received_bytes, received_data)
+    save_received_bytes(received_bytes_file, received_data)
     save_reconstructed_bytes(reconstructed_bytes, reconstructed_data)
     save_reconstructed_image(image_file, reconstructed_data)
     print('%s; Received size: %d; Reconstructed size %d' % (type, len(received_data), len(received_data)))
