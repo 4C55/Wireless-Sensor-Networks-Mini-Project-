@@ -15,7 +15,7 @@
 /*****************************************************************************/
 
 #define SIZE_OF_IMAGE_BUFFER (4 * 1024)
-#define COMPRESSION_TYPE COMPRESSION_TYPE_NONE
+#define COMPRESSION_TYPE COMPRESSION_TYPE_SCALE
 
 /*****************************************************************************/
 /* PRIVATE ENUMERATIONS                                                      */
@@ -80,6 +80,10 @@ static uint32_t apply_compression(
     case COMPRESSION_TYPE_RUN_LENGTH:
     {
       return compression_runlength(buffer, original_length);
+    }
+    case COMPRESSION_TYPE_SCALE:
+    {
+      return compression_scale(buffer, original_length, 256);
     }
     default:
     {
