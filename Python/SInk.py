@@ -105,7 +105,7 @@ def main(argv):
                     received_data.pop(-1)
                     received_data.pop(-1)
                     received_data.pop(-1)
-                    print('Image received:', end=' ', flush=True)
+                    print('Image received (%d bytes):' % (len(received_data, )), end=' ', flush=True)
                     handle_image(path, received_data, compression_type)
                     state = STATE_IDLE
                     received_data = []
