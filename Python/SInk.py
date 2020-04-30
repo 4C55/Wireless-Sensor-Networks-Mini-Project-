@@ -6,6 +6,7 @@ import numpy as np
 from Message.MessageHandler import MessageHandler
 from Message import CompressionType
 from Compression import RunlLength
+from Compression import Scale
 
 STATE_IDLE = 0
 STATE_RECEIVING_IMAGE = 1
@@ -54,7 +55,7 @@ def handle_image(parent_path, received_data, compression_type):
         reconstructed_data = received_data
     elif compression_type == CompressionType.COMPRESSION_TYPE_SCALE:
         type = 'COMPRESSION_TYPE_SCALE'
-        reconstructed_data = received_data
+        reconstructed_data = Scale.reconstruct(received_data, 256)
     elif compression_type == CompressionType.COMPRESSION_TYPE_RUN_LENGTH:
         type = 'COMPRESSION_TYPE_RUN_LENGTH'
         reconstructed_data = RunlLength.reconstruct(received_data)
