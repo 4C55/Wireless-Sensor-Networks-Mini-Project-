@@ -94,6 +94,7 @@ enum sink_link_state sink_link_continue_sending(void)
       case PACKET_RESULT_START:
       {
         /*Start sending:*/
+        NETSTACK_MAC.on();
         nullnet_len = get_next_packet_size();
         result = PACKET_RESULT_IN_PROGRESS;
         NETSTACK_NETWORK.output(&sink_address, send_callback);
@@ -111,6 +112,8 @@ enum sink_link_state sink_link_continue_sending(void)
         nullnet_len = get_next_packet_size();
 
         if (nullnet_len == 0) {
+          /*Done sending all packets*/
+          NETSTACK_MAC.off();
           result = PACKET_RESULT_NONE;
           return CONNECTION_STATE_IDLE;
         }

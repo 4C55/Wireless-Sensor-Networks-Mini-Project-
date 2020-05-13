@@ -40,6 +40,7 @@ static uint8_t image_buffer[SIZE_OF_IMAGE_BUFFER];
 static uint32_t total_to_send;
 static uint32_t total_sent = 0;
 static uint32_t total_count = 0;
+static uint32_t compressed_length;
 
 /*****************************************************************************/
 /* PRIVATE FUNCTIONS                                                         */
@@ -111,7 +112,6 @@ PROCESS_THREAD(producer_process, ev, data)
 
   while(1) {
     PROCESS_PAUSE();
-
     PROCESS_WAIT_EVENT_UNTIL(ev == sensors_event && data == &button_sensor);
 
     P2OUT |= (1 << 3);
@@ -135,7 +135,7 @@ PROCESS_THREAD(producer_process, ev, data)
 
       /*Compress the chunk*/
       P2OUT |= (1 << 6);
-      uint32_t compressed_length = apply_compression(
+      compressed_length = apply_compression(
         image_buffer,
         total_count,
         COMPRESSION_TYPE

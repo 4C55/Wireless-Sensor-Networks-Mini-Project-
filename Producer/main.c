@@ -83,6 +83,10 @@ static uint32_t apply_compression(
     {
       return compression_runlength(buffer, original_length);
     }
+    case COMPRESSION_TYPE_SCALE:
+    {
+      return compression_scale(buffer, original_length, 256);
+    }
     default:
     {
       return original_length;
@@ -218,7 +222,8 @@ PROCESS_THREAD(producer_process, ev, data)
           &message,
           reply_destination,
           MESSAGE_TYPE_SEND_TO_SINK_REPLY,
-          sizeof(message.data.send_to_sink_rep)); 
+          sizeof(message.data.send_to_sink_rep));
+
       P2OUT &= ~(1 << 3);
     }
   }
