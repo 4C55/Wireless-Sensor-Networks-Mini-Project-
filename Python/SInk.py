@@ -59,6 +59,9 @@ def handle_image(parent_path, received_data, compression_type):
     elif compression_type == CompressionType.COMPRESSION_TYPE_RUN_LENGTH:
         type = 'COMPRESSION_TYPE_RUN_LENGTH'
         reconstructed_data = RunlLength.reconstruct(received_data)
+    elif compression_type == CompressionType.COMPRESSION_TYPE_RUN_LENGTH_LOSSY:
+        type = 'COMPRESSION_TYPE_RUN_LENGTH_LOSSY'
+        reconstructed_data = RunlLength.reconstruct(received_data)
     else:
         print('Unknown compression type!')
         return
