@@ -15,7 +15,7 @@
 /*****************************************************************************/
 
 #define SIZE_OF_IMAGE_BUFFER (4 * 1024)
-#define COMPRESSION_TYPE COMPRESSION_TYPE_SCALE
+#define COMPRESSION_TYPE COMPRESSION_TYPE_RUN_LENGTH_LOSSY
 
 /*****************************************************************************/
 /* PRIVATE ENUMERATIONS                                                      */
@@ -78,6 +78,10 @@ static uint32_t apply_compression(
 {
   switch (type)
   {
+    case COMPRESSION_TYPE_RUN_LENGTH_LOSSY:
+    {
+      return compression_runlength_lossy(buffer, original_length, 5);
+    }
     case COMPRESSION_TYPE_RUN_LENGTH:
     {
       return compression_runlength(buffer, original_length);
@@ -92,7 +96,6 @@ static uint32_t apply_compression(
     }
   }
 }
-
 /*****************************************************************************/
 /* PROCESS FUNCTIONS                                                         */
 /*****************************************************************************/
