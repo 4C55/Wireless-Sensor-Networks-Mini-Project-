@@ -2,4 +2,3 @@ build/
 .idea/
 .sky
 *.pyc
-Test/
