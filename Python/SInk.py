@@ -16,7 +16,7 @@ def save_info(file, received_len, reconstructed_len):
     with open(file, 'w+') as f:
         f.write('"SEP=;"\n')
         f.write('recived_len;reconstructed_len\n')
-        f.write('%d;%d\n' % (received_len, received_len))
+        f.write('%d;%d\n' % (received_len, reconstructed_len))
 
 
 def save_received_bytes(file, received_bytes):
